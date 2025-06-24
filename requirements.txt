@@ -1,0 +1,10 @@
+blinker @ file:///home/conda/feedstock_root/build_artifacts/blinker_1731096409132/work
+click @ file:///home/conda/feedstock_root/build_artifacts/click_1734858813237/work
+Flask @ file:///home/conda/feedstock_root/build_artifacts/flask_1747203985407/work
+importlib_metadata @ file:///home/conda/feedstock_root/build_artifacts/bld/rattler-build_importlib-metadata_1747934053/work
+imutils==0.5.4
+itsdangerous @ file:///home/conda/feedstock_root/build_artifacts/itsdangerous_1733308265247/work
+Jinja2 @ file:///home/conda/feedstock_root/build_artifacts/jinja2_1741263328855/work
+MarkupSafe @ file:///Users/runner/miniforge3/conda-bld/markupsafe_1733219663979/work
+Werkzeug @ file:///home/conda/feedstock_root/build_artifacts/werkzeug_1733160440960/work
+zipp @ file:///home/conda/feedstock_root/build_artifacts/zipp_1749421620841/work
