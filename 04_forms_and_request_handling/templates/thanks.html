@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Thank you{% endblock %}
+
+{% block content %}
+  <article class="profile">
+    <h2>Thanks — request received ✅</h2>
+    <p>
+      You are looking at a <strong>GET</strong> request. Press <kbd>F5</kbd>:
+      nothing is re-submitted and no duplicate lead is created. That is the
+      entire point of POST/Redirect/GET.
+    </p>
+    <p class="hint">{{ lead_count|default(0) }} lead(s) captured this session.</p>
+    <p>
+      <a href="{{ url_for('list_leads') }}">See captured leads</a> ·
+      <a href="{{ url_for('request_demo') }}">Submit another</a>
+    </p>
+  </article>
+{% endblock %}

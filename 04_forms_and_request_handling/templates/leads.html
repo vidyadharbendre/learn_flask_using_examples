@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}Captured leads{% endblock %}
+
+{% block content %}
+  <h2>Captured leads ({{ leads|length }})</h2>
+  <p class="hint">
+    Same URL, two representations. Ask for JSON instead:
+    <code>curl -H "Accept: application/json" http://127.0.0.1:5004/leads</code>
+  </p>
+
+  {% if leads %}
+    <table>
+      <thead>
+        <tr><th>Name</th><th>Email</th><th>Company</th><th>Team</th><th>When (UTC)</th></tr>
+      </thead>
+      <tbody>
+        {% for lead in leads %}
+          <tr>
+            <td>{{ lead.name }}</td>
+            <td>{{ lead.email }}</td>
+            <td>{{ lead.company }}</td>
+            <td>{{ lead.team_size }}</td>
+            {# strftime works because submitted_at is a real datetime, not a
+               string. Keep values typed until the moment you render them. #}
+            <td>{{ lead.submitted_at.strftime('%Y-%m-%d %H:%M') }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="empty">
+      No leads yet. <a href="{{ url_for('request_demo') }}">Submit the form</a>.
+    </p>
+  {% endif %}
+
+  <div class="flash flash-warning">
+    <strong>Note:</strong> leads live in a module-level list, so they vanish on
+    restart and are <em>not</em> shared between gunicorn workers. Day 08 fixes
+    that with a database.
+  </div>
+{% endblock %}

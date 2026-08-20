@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% block title %}Request a demo{% endblock %}
+
+{% block content %}
+  <h2>Request a demo</h2>
+  <p class="hint">
+    Every field is validated on the <strong>server</strong>. Try bypassing the
+    browser entirely with <code>curl</code> — the rules still hold.
+  </p>
+
+  {#
+    method="post" sends the body as application/x-www-form-urlencoded, which
+    lands in request.form. The default (method="get") would put your data in
+    the URL — visible in logs, browser history and Referer headers. Never GET
+    a form that changes state or carries personal data.
+
+    novalidate switches OFF the browser's built-in checks so you can SEE the
+    server-side errors while learning. Remove it in production: client-side
+    validation is good UX, it is simply not security.
+  #}
+  <form method="post" action="{{ url_for('request_demo') }}" novalidate>
+
+    {# CSRF token: unguessable, session-bound, checked before anything else. #}
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+
+    {# HONEYPOT: hidden from humans, irresistible to naive bots.
+       tabindex=-1 and autocomplete=off stop keyboard users and password
+       managers touching it. aria-hidden keeps it out of screen readers. #}
+    <div class="honeypot" aria-hidden="true">
+      <label for="website">Leave this field empty</label>
+      <input type="text" id="website" name="website" tabindex="-1" autocomplete="off" />
+    </div>
+
+    <label for="name">Your name</label>
+    {#
+      STICKY FIELDS: value="{{ data.name }}" re-fills what the user typed when
+      validation fails. Without this, a single mistake wipes the whole form and
+      the user leaves. `data` is {} on a fresh GET, so `data.name` is undefined
+      and `|default('')` prints nothing.
+
+      aria-invalid + aria-describedby wire the error text to the input for
+      screen readers.
+    #}
+    <input type="text" id="name" name="name" maxlength="80"
+           value="{{ data.name|default('') }}"
+           aria-invalid="{{ 'true' if errors.name else 'false' }}"
+           {% if errors.name %}aria-describedby="name-error"{% endif %} />
+    {% if errors.name %}<p class="field-error" id="name-error">{{ errors.name }}</p>{% endif %}
+
+    <label for="email">Work email</label>
+    <input type="email" id="email" name="email"
+           value="{{ data.email|default('') }}"
+           aria-invalid="{{ 'true' if errors.email else 'false' }}"
+           {% if errors.email %}aria-describedby="email-error"{% endif %} />
+    {% if errors.email %}<p class="field-error" id="email-error">{{ errors.email }}</p>{% endif %}
+
+    <label for="company">Company</label>
+    <input type="text" id="company" name="company"
+           value="{{ data.company|default('') }}"
+           aria-invalid="{{ 'true' if errors.company else 'false' }}" />
+    {% if errors.company %}<p class="field-error">{{ errors.company }}</p>{% endif %}
+
+    <label for="team_size">Team size</label>
+    <select id="team_size" name="team_size">
+      <option value="">Choose…</option>
+      {% for size in team_sizes %}
+        {# Re-select the previously chosen option — stickiness applies to
+           <select> and checkboxes too, not just text inputs. #}
+        <option value="{{ size }}"
+                {% if data.team_size|default('') == size %}selected{% endif %}>
+          {{ size }} people
+        </option>
+      {% endfor %}
+    </select>
+    {% if errors.team_size %}<p class="field-error">{{ errors.team_size }}</p>{% endif %}
+
+    <label for="message">What would you like to see? <span class="hint">(optional)</span></label>
+    {# A textarea's value goes between the tags, NOT in a value attribute. #}
+    <textarea id="message" name="message" maxlength="1000">{{ data.message|default('') }}</textarea>
+    {% if errors.message %}<p class="field-error">{{ errors.message }}</p>{% endif %}
+
+    <p><button type="submit">Request demo</button></p>
+  </form>
+{% endblock %}
