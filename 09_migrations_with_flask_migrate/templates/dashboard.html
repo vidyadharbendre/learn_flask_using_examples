@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block title %}Schema{% endblock %}
+
+{% block content %}
+  <h2>Inventory after three migrations</h2>
+
+  <div class="flash flash-info">
+    <strong>Applied revision:</strong> <code>{{ revision }}</code>
+    <br />
+    That value is read from the <code>alembic_version</code> table in your
+    database. It is the entire mechanism: one row recording where this
+    particular database sits in the migration chain.
+  </div>
+
+  <h3>Products</h3>
+  <p class="hint">
+    <code>barcode</code> and <code>reorder_level</code> arrived in migration 2;
+    <code>supplier</code> in migration 3. The barcodes below were
+    <strong>backfilled by the migration itself</strong> — the rows existed
+    before the column did.
+  </p>
+  <table>
+    <thead>
+      <tr><th>SKU</th><th>Name</th><th>Barcode</th>
+          <th class="num">Price</th><th class="num">Qty</th>
+          <th class="num">Reorder</th><th>Supplier</th></tr>
+    </thead>
+    <tbody>
+      {% for product in products %}
+        <tr class="{{ 'is-low' if product.is_low_stock }}">
+          <td><code>{{ product.sku }}</code></td>
+          <td>{{ product.name }}</td>
+          {# A NULL barcode is a product added after the backfill ran. #}
+          <td><code>{{ product.barcode or '—' }}</code></td>
+          <td class="num">{{ product.price|inr }}</td>
+          <td class="num">{{ product.quantity }}</td>
+          <td class="num">{{ product.reorder_level }}</td>
+          {# supplier is nullable, so guard the attribute access. #}
+          <td>{{ product.supplier.name if product.supplier else '—' }}</td>
+        </tr>
+      {% else %}
+        <tr><td colspan="7" class="empty">
+          No products. Run <code>flask --app 09_migrations_with_flask_migrate/app.py seed</code>.
+        </td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <h3>What the database actually looks like right now</h3>
+  <p class="hint">
+    Read with SQLAlchemy's <code>inspect()</code> against the <em>live</em>
+    database — not from <code>models.py</code>. Models describe what you
+    <em>want</em>; this is what you <em>have</em>. Migrations close the gap.
+  </p>
+  <table>
+    <thead><tr><th>Table</th><th>Columns</th></tr></thead>
+    <tbody>
+      {% for table, columns in live_columns.items() %}
+        <tr>
+          <td><code>{{ table }}</code></td>
+          <td class="hint">{{ columns|join(', ') }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="flash flash-warning">
+    <strong>Try this:</strong> add a column to <code>Product</code> in
+    <code>models.py</code>, then reload this page. The new column is
+    <em>not</em> in the table above, and any query touching it fails with
+    <code>no such column</code>. Run
+    <code>flask db migrate -m "..."</code> then <code>flask db upgrade</code>,
+    reload, and watch it appear.
+  </div>
+{% endblock %}
