@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import pytest
+from conftest import LoginHelper
 from flask import Flask
 from flask.testing import FlaskClient
 
@@ -11,7 +12,7 @@ from analytics.models import Response, Survey, SurveyStatus, User
 
 
 @pytest.mark.integration
-def test_full_lifecycle(client: FlaskClient, user: User, login) -> None:
+def test_full_lifecycle(client: FlaskClient, user: User, login: LoginHelper) -> None:
     """Create a survey, collect a public response, read the stats."""
     login()
 
@@ -66,7 +67,7 @@ def test_score_out_of_range_is_rejected(
 
 
 def test_csv_export_headers_and_rows(
-    client: FlaskClient, user: User, survey: Survey, login
+    client: FlaskClient, user: User, survey: Survey, login: LoginHelper
 ) -> None:
     """The export is a download, and contains one row per response."""
     login()

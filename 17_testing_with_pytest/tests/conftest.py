@@ -162,11 +162,12 @@ class TimeHelper:
 
     now = FROZEN_NOW
 
-    def __call__(self, hour: int, minute: int = 0) -> datetime:
+    def __call__(self, hour: float, minute: int = 0) -> datetime:
         """Return a time on the frozen day.
 
         Args:
-            hour: Hour of the day (may exceed 23 to reach the next day).
+            hour: Hour of the day; may be fractional, and may exceed 23 to
+                reach the following day.
             minute: Minute of the hour.
 
         Returns:

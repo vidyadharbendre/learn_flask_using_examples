@@ -109,19 +109,28 @@ For each day:
 | Day *N* on port `5000 + N` | run several days side by side |
 | `templates/` and `static/` per day | each example is independently runnable |
 | `_partial.html` naming | leading underscore = "not a page" |
-| Type annotations everywhere | `mypy --strict` passes; run `./typecheck.sh` |
+| Type annotations everywhere | `./typecheck.sh` passes clean across all 21 days |
 | Pinned dependency versions | the examples behave identically on every machine |
 | Docstrings with `Args:`/`Returns:` | Google style, readable by humans and tooling |
 
 ### Verify your setup
 
 ```bash
-./typecheck.sh          # mypy --strict, one example at a time
+./typecheck.sh                                   # type-check every day
+cd 14_project_task_manager && pytest             # 30 tests
+cd 17_testing_with_pytest && pytest              # 45 tests
+cd 21_capstone_analytics_dashboard && pytest     # 43 tests
 ```
 
 > Each day ships its own `app.py`, so a single `mypy .` fails with
 > `Duplicate module named "app"`. `typecheck.sh` runs the checker per directory,
 > which is the correct fix for this layout.
+>
+> `mypy.ini` deliberately does **not** use `--strict`. Several Flask extensions
+> ship no type stubs, so strict mode reports "Untyped decorator makes function X
+> untyped" for every view — noise that says nothing about your code. The
+> settings keep the checks that catch real bugs and silence the ones that only
+> report missing third-party stubs.
 
 ---
 

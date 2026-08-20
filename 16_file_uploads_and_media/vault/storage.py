@@ -33,7 +33,7 @@ import secrets
 import uuid
 from dataclasses import dataclass
 from pathlib import Path
-from typing import BinaryIO, Final
+from typing import IO, Final
 
 from PIL import Image, UnidentifiedImageError
 from werkzeug.datastructures import FileStorage
@@ -166,7 +166,7 @@ def generate_stored_name(extension: str) -> str:
     return f"{uuid.uuid4().hex}{extension}"
 
 
-def detect_type(stream: BinaryIO) -> tuple[str, str, int | None, int | None]:
+def detect_type(stream: IO[bytes]) -> tuple[str, str, int | None, int | None]:
     """Determine a file's real type by inspecting its **contents**.
 
     Args:
@@ -333,13 +333,19 @@ def _make_thumbnail(source: Path, thumbs_dir: Path, stored_name: str) -> str | N
     thumb_name = f"{Path(stored_name).stem}.jpg"
 
     try:
-        with Image.open(source) as image:
+        with Image.open(source) as opened:
+            # `opened` is an ImageFile; convert() returns a plain Image, so the
+            # working value gets its own name rather than being reassigned —
+            # mypy rejects narrowing ImageFile to Image, and the separate name
+            # is clearer anyway.
+            image: Image.Image = opened
+
             # Flatten transparency onto white; JPEG has no alpha channel, and
             # saving an RGBA image as JPEG raises OSError.
             if image.mode in {"RGBA", "LA", "P"}:
-                image = image.convert("RGBA")
-                background = Image.new("RGB", image.size, (255, 255, 255))
-                background.paste(image, mask=image.split()[-1])
+                rgba = image.convert("RGBA")
+                background = Image.new("RGB", rgba.size, (255, 255, 255))
+                background.paste(rgba, mask=rgba.split()[-1])
                 image = background
             elif image.mode != "RGB":
                 image = image.convert("RGB")

@@ -7,6 +7,7 @@ and every one would then represent a data breach.
 
 from __future__ import annotations
 
+from conftest import LoginHelper
 from flask import Flask
 from flask.testing import FlaskClient
 
@@ -34,7 +35,7 @@ def _survey_for(owner: User, title: str = "Private") -> Survey:
 
 
 def test_cannot_view_another_users_survey(
-    client: FlaskClient, user: User, other_user: User, login
+    client: FlaskClient, user: User, other_user: User, login: LoginHelper
 ) -> None:
     """Someone else's survey is a 404, not a 403.
 
@@ -46,7 +47,7 @@ def test_cannot_view_another_users_survey(
 
 
 def test_cannot_edit_or_delete_another_users_survey(
-    client: FlaskClient, user: User, other_user: User, login
+    client: FlaskClient, user: User, other_user: User, login: LoginHelper
 ) -> None:
     """Writes are authorised as carefully as reads — and must not take effect."""
     theirs = _survey_for(other_user)
@@ -59,7 +60,7 @@ def test_cannot_edit_or_delete_another_users_survey(
 
 
 def test_cannot_export_another_users_data(
-    client: FlaskClient, user: User, other_user: User, login
+    client: FlaskClient, user: User, other_user: User, login: LoginHelper
 ) -> None:
     """Export is a read of everything — it must be authorised too."""
     theirs = _survey_for(other_user)
@@ -68,7 +69,7 @@ def test_cannot_export_another_users_data(
 
 
 def test_dashboard_lists_only_own_surveys(
-    client: FlaskClient, user: User, other_user: User, survey: Survey, login
+    client: FlaskClient, user: User, other_user: User, survey: Survey, login: LoginHelper
 ) -> None:
     """The list query is scoped by owner, not filtered in the template."""
     _survey_for(other_user, title="TheirSecret")
@@ -102,7 +103,7 @@ def test_api_rejects_missing_and_invalid_tokens(client: FlaskClient, user: User)
 
 
 def test_rotating_the_token_revokes_the_old_one(
-    client: FlaskClient, user: User, login
+    client: FlaskClient, user: User, login: LoginHelper
 ) -> None:
     """Rotation IS revocation for an opaque token."""
     old_token = user.api_token

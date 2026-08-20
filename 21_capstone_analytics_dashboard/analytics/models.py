@@ -17,7 +17,7 @@ from __future__ import annotations
 import enum
 import secrets
 from datetime import datetime, timezone
-from typing import Any
+from typing import Any, Protocol, Sequence
 
 from sqlalchemy import (
     CheckConstraint,
@@ -34,6 +34,18 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import UserMixin
 
 from .extensions import db
+
+
+class HasScore(Protocol):
+    """Anything with a ``score`` — all :func:`summarise` actually needs.
+
+    Typing the parameter as a Protocol rather than ``list[Response]`` is
+    honest about the real dependency: the function reads one attribute and
+    touches no database. It also lets tests pass a tiny fake without a
+    ``type: ignore``, which is the point of keeping the logic pure (Day 17).
+    """
+
+    score: int
 
 
 def utcnow() -> datetime:
@@ -353,7 +365,7 @@ class Response(db.Model):
         }
 
 
-def summarise(responses: list[Response]) -> dict[str, Any]:
+def summarise(responses: "Sequence[HasScore]") -> dict[str, Any]:
     """Aggregate responses into dashboard figures.
 
     Args:
