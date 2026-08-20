@@ -64,6 +64,7 @@ from flask import (
     session,
     url_for,
 )
+from flask.typing import ResponseReturnValue
 from werkzeug.wrappers import Response as WerkzeugResponse
 
 import storage
@@ -180,7 +181,7 @@ def _current_filters() -> dict[str, str]:
 
 
 @app.route("/", methods=["GET", "POST"])
-def dashboard() -> str | WerkzeugResponse:
+def dashboard() -> ResponseReturnValue:
     """Show the dashboard and handle new-expense submissions.
 
     Combines the Day 04 POST/Redirect/GET pattern with the Day 05 form class and
@@ -205,7 +206,11 @@ def dashboard() -> str | WerkzeugResponse:
               "success")
         # Redirect preserving the active filters, so the user stays where they
         # were instead of being bounced back to an unfiltered list.
-        return redirect(url_for("dashboard", **_current_filters()), code=303)
+        # url_for's stub types **values narrowly; the runtime accepts any
+        # value that can be rendered into a query string.
+        return redirect(
+            url_for("dashboard", **_current_filters()), code=303  # type: ignore[arg-type]
+        )
 
     filters = _current_filters()
     expenses = storage.list_expenses(

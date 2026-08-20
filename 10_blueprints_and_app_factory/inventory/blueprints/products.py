@@ -22,6 +22,7 @@ from flask import (
 )
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
+from flask.typing import ResponseReturnValue
 from werkzeug.wrappers import Response
 
 from ..extensions import db
@@ -104,7 +105,7 @@ def index() -> str:
 
 
 @products_bp.route("/new", methods=["GET", "POST"])
-def create() -> str | Response:
+def create() -> ResponseReturnValue:
     """Create a product.
 
     Returns:
@@ -159,7 +160,7 @@ def detail(product_id: int) -> str:
 
 
 @products_bp.route("/<int:product_id>/edit", methods=["GET", "POST"])
-def edit(product_id: int) -> str | Response:
+def edit(product_id: int) -> ResponseReturnValue:
     """Edit an existing product.
 
     Args:

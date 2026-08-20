@@ -23,6 +23,7 @@ from flask import (
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import check_password_hash, generate_password_hash
+from flask.typing import ResponseReturnValue
 from werkzeug.wrappers import Response
 
 from flask_login import current_user, login_required, login_user, logout_user
@@ -113,7 +114,7 @@ def _verify_credentials(email: str, password: str) -> User | None:
 
 
 @auth_bp.route("/register", methods=["GET", "POST"])
-def register() -> str | Response:
+def register() -> ResponseReturnValue:
     """Create a new account.
 
     Returns:
@@ -163,7 +164,7 @@ def register() -> str | Response:
 
 
 @auth_bp.route("/login", methods=["GET", "POST"])
-def login() -> str | Response:
+def login() -> ResponseReturnValue:
     """Sign an existing user in.
 
     Returns:
@@ -193,10 +194,9 @@ def login() -> str | Response:
         flash(f"Signed in as {user.display_name}.", "success")
 
         # ---- the redirect, done safely --------------------------------------
-        next_url = request.args.get("next")
-        if not is_safe_redirect_url(next_url):
-            next_url = url_for("main.dashboard")
-        return redirect(next_url, code=303)
+        requested = request.args.get("next")
+        next_url = requested if is_safe_redirect_url(requested) else None
+        return redirect(next_url or url_for("main.dashboard"), code=303)
 
     return render_template("auth/login.html", form=form), (422 if form.errors else 200)
 
@@ -251,7 +251,7 @@ def logout() -> Response:
 
 @auth_bp.route("/password", methods=["GET", "POST"])
 @login_required
-def change_password() -> str | Response:
+def change_password() -> ResponseReturnValue:
     """Change the signed-in user's password.
 
     Returns:

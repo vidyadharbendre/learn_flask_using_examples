@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import task_row %}
+{% block title %}All tasks{% endblock %}
+
+{% block content %}
+  <h2>All tasks</h2>
+  <p class="hint">
+    Every filter is applied in SQL, and the base query is scoped by
+    <code>Project.owner_id == current_user.id</code> — so a hand-edited
+    <code>?project=</code> pointing at someone else’s project returns nothing.
+  </p>
+
+  <form method="get" action="{{ url_for('tasks.index') }}" class="filters">
+    <div class="form-row">
+      <label for="q">Search</label>
+      <input type="search" id="q" name="q" value="{{ filters.q }}" placeholder="Title…" />
+    </div>
+    <div class="form-row">
+      <label for="status">Status</label>
+      <select id="status" name="status">
+        <option value="">Any</option>
+        {% for status in statuses %}
+          <option value="{{ status.value }}"
+                  {% if filters.status == status.value %}selected{% endif %}>{{ status.label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-row">
+      <label for="priority">Priority</label>
+      <select id="priority" name="priority">
+        <option value="">Any</option>
+        {% for priority in priorities %}
+          <option value="{{ priority.value }}"
+                  {% if filters.priority == priority.value %}selected{% endif %}>{{ priority.label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-row">
+      <label for="project">Project</label>
+      <select id="project" name="project">
+        <option value="">Any</option>
+        {% for project in projects %}
+          <option value="{{ project.id }}"
+                  {% if filters.project == project.id|string %}selected{% endif %}>{{ project.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-row">
+      <label class="check">
+        <input type="checkbox" name="overdue" value="1"
+               {% if filters.overdue == '1' %}checked{% endif %} />
+        <span>Overdue only</span>
+      </label>
+    </div>
+    <p><button type="submit">Filter</button>
+       <a class="hint" href="{{ url_for('tasks.index') }}">Clear</a></p>
+  </form>
+
+  {% if tasks %}
+    <table>
+      <thead><tr><th>Task</th><th>Status</th><th>Priority</th><th>Due</th><th>Move to</th></tr></thead>
+      <tbody>
+        {% for task in tasks %}
+          {{ task_row(task, url_for('tasks.index', **filters), show_project=true) }}
+        {% endfor %}
+      </tbody>
+    </table>
+
+    {% if pagination.pages > 1 %}
+      <nav class="pager">
+        {% if pagination.has_prev %}
+          <a href="{{ url_for('tasks.index', page=pagination.prev_num, **filters) }}">← Previous</a>
+        {% endif %}
+        <span class="hint">Page {{ pagination.page }} of {{ pagination.pages }}
+          ({{ pagination.total }} tasks)</span>
+        {% if pagination.has_next %}
+          <a href="{{ url_for('tasks.index', page=pagination.next_num, **filters) }}">Next →</a>
+        {% endif %}
+      </nav>
+    {% endif %}
+  {% else %}
+    <p class="empty">No tasks match those filters.</p>
+  {% endif %}
+{% endblock %}

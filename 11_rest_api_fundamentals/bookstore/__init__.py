@@ -48,6 +48,7 @@ from pathlib import Path
 
 import click
 from flask import Flask, Response, jsonify, request
+from flask.typing import ResponseReturnValue
 from flask.cli import with_appcontext
 
 from .errors import register_error_handlers
@@ -108,7 +109,7 @@ def _register_api_conventions(app: Flask) -> None:
     """
 
     @app.before_request
-    def require_json_accept() -> Response | None:
+    def require_json_accept() -> ResponseReturnValue | None:
         """Reject clients that cannot accept JSON.
 
         Returns:

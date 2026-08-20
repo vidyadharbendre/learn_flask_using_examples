@@ -101,7 +101,7 @@ def routes_by_blueprint_command() -> None:
     grouped: dict[str, list[str]] = {}
     for rule in current_app.url_map.iter_rules():
         blueprint = rule.endpoint.split(".")[0] if "." in rule.endpoint else "(app)"
-        methods = ",".join(sorted(rule.methods - {"HEAD", "OPTIONS"}))
+        methods = ",".join(sorted((rule.methods or set()) - {"HEAD", "OPTIONS"}))
         grouped.setdefault(blueprint, []).append(f"{methods:<12} {rule.rule:<34} -> {rule.endpoint}")
 
     for blueprint in sorted(grouped):

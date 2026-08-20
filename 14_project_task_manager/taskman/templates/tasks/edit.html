@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import render_field %}
+{% block title %}{{ task.title }}{% endblock %}
+
+{% block content %}
+  <h2>Edit task</h2>
+  <p class="hint">In project
+    <a href="{{ url_for('projects.detail', project_id=task.project_id) }}">{{ task.project.name }}</a>
+  </p>
+
+  <form method="post" action="{{ url_for('tasks.edit', task_id=task.id) }}" novalidate>
+    {{ form.hidden_tag() }}
+    {{ render_field(form.title) }}
+    <div class="three-col">
+      {{ render_field(form.status) }}
+      {{ render_field(form.priority) }}
+      {{ render_field(form.due_on) }}
+    </div>
+    {{ render_field(form.assignee_id) }}
+    {{ render_field(form.notes) }}
+    <p>{{ form.submit() }}</p>
+  </form>
+
+  <p class="row-actions">
+    <a href="{{ url_for('projects.detail', project_id=task.project_id) }}">← Back to project</a>
+    <form method="post" class="inline"
+          action="{{ url_for('tasks.delete', task_id=task.id) }}"
+          onsubmit="return confirm('Delete this task?');">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      <button type="submit" class="danger">Delete task</button>
+    </form>
+  </p>
+{% endblock %}

@@ -62,6 +62,7 @@ from flask import (
     request,
     url_for,
 )
+from flask.typing import ResponseReturnValue
 from werkzeug.wrappers import Response as WerkzeugResponse
 
 import repository as repo
@@ -168,7 +169,7 @@ def _category_choices() -> list[tuple[int, str]]:
 # Views
 # -----------------------------------------------------------------------------
 @app.route("/", methods=["GET", "POST"])
-def dashboard() -> str | WerkzeugResponse:
+def dashboard() -> ResponseReturnValue:
     """List products, show inventory totals, and handle product creation.
 
     Returns:
@@ -218,7 +219,7 @@ def dashboard() -> str | WerkzeugResponse:
 
 
 @app.route("/products/<int:product_id>", methods=["GET", "POST"])
-def product_detail(product_id: int) -> str | WerkzeugResponse:
+def product_detail(product_id: int) -> ResponseReturnValue:
     """Show one product with its movement ledger, and record new movements.
 
     Args:

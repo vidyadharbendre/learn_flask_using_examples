@@ -1,0 +1,58 @@
+{% macro render_field(field) %}
+  <div class="form-row">
+    {{ field.label }}
+    {{ field(**{'aria-invalid': 'true' if field.errors else 'false'}) }}
+    {% if field.errors %}
+      <ul class="field-error">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+    {% endif %}
+  </div>
+{% endmacro %}
+
+{% macro status_badge(status) %}
+  {# The enum subclasses str, so `status.value` is a plain string usable as a
+     CSS class, while Python code still gets a real TaskStatus member. #}
+  <span class="badge status-{{ status.value }}">{{ status.label }}</span>
+{% endmacro %}
+
+{% macro priority_badge(priority) %}
+  <span class="badge prio-{{ priority.value }}">{{ priority.label }}</span>
+{% endmacro %}
+
+{% macro status_buttons(task, return_to) %}
+  {#
+    One-click status changes. Each is a POST inside its own form — changing
+    state via GET would let crawlers and prefetchers move your tasks around.
+    `return_to` is validated server-side before being used as a redirect target.
+  #}
+  <span class="status-actions">
+    {% for status in TaskStatus %}
+      {% if status != task.status %}
+        <form method="post" class="inline"
+              action="{{ url_for('tasks.set_status', task_id=task.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          <input type="hidden" name="status" value="{{ status.value }}" />
+          <input type="hidden" name="return_to" value="{{ return_to }}" />
+          <button type="submit" class="tiny">{{ status.label }}</button>
+        </form>
+      {% endif %}
+    {% endfor %}
+  </span>
+{% endmacro %}
+
+{% macro task_row(task, return_to, show_project=false) %}
+  <tr class="{{ 'is-overdue' if task.is_overdue }} {{ 'is-done' if task.status == TaskStatus.DONE }}">
+    <td>
+      <a href="{{ url_for('tasks.edit', task_id=task.id) }}">{{ task.title }}</a>
+      {% if show_project %}
+        <br /><span class="hint">{{ task.project.name }}</span>
+      {% endif %}
+    </td>
+    <td>{{ status_badge(task.status) }}</td>
+    <td>{{ priority_badge(task.priority) }}</td>
+    <td class="hint">
+      {{ task.due_on|nice_date }}
+      {% if task.is_overdue %}<span class="warn-dot" title="Overdue">●</span>{% endif %}
+    </td>
+    <td>{{ status_buttons(task, return_to) }}</td>
+  </tr>
+{% endmacro %}

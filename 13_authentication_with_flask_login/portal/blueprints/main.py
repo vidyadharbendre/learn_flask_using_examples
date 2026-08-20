@@ -23,6 +23,7 @@ from flask import (
     url_for,
 )
 from sqlalchemy import select
+from flask.typing import ResponseReturnValue
 from werkzeug.wrappers import Response as WerkzeugResponse
 
 from flask_login import current_user, login_required
@@ -91,7 +92,7 @@ def home() -> str:
 
 @main_bp.route("/dashboard", methods=["GET", "POST"])
 @login_required
-def dashboard() -> str | WerkzeugResponse:
+def dashboard() -> ResponseReturnValue:
     """The signed-in user's private notes.
 
     Returns:
@@ -129,7 +130,7 @@ def dashboard() -> str | WerkzeugResponse:
 
 @main_bp.route("/notes/<int:note_id>")
 @login_required
-def note_detail(note_id: int) -> str:
+def note_detail(note_id: int) -> ResponseReturnValue:
     """Show one note — **if it belongs to you**.
 
     Args:

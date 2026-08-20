@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import render_field %}
+{% block title %}Edit {{ project.name }}{% endblock %}
+{% block content %}
+  <h2>Edit project</h2>
+  <form method="post" novalidate
+        action="{{ url_for('projects.edit', project_id=project.id) }}">
+    {{ form.hidden_tag() }}
+    {{ render_field(form.name) }}
+    {{ render_field(form.description) }}
+    <p>{{ form.submit() }}
+       <a class="hint" href="{{ url_for('projects.detail', project_id=project.id) }}">Cancel</a></p>
+  </form>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import render_field, task_row %}
+{% block title %}{{ project.name }}{% endblock %}
+
+{% block content %}
+  <h2>{{ project.name }}</h2>
+  <p class="hint">{{ project.description or 'No description.' }}</p>
+  <div class="progress"><span style="width: {{ project.progress }}%"></span></div>
+  <p class="hint">{{ project.progress }}% complete ·
+    {{ project.open_count }} open of {{ project.tasks|length }} task(s) ·
+    <a href="{{ url_for('projects.edit', project_id=project.id) }}">Edit project</a>
+  </p>
+
+  <h3>Add a task</h3>
+  <form method="post" novalidate
+        action="{{ url_for('tasks.create', project_id=project.id) }}">
+    {{ form.hidden_tag() }}
+    {{ render_field(form.title) }}
+    <div class="three-col">
+      {{ render_field(form.status) }}
+      {{ render_field(form.priority) }}
+      {{ render_field(form.due_on) }}
+    </div>
+    {{ render_field(form.assignee_id) }}
+    {{ render_field(form.notes) }}
+    <p>{{ form.submit() }}</p>
+  </form>
+
+  <h3>Tasks</h3>
+  {% if project.tasks %}
+    <table>
+      <thead><tr><th>Task</th><th>Status</th><th>Priority</th><th>Due</th><th>Move to</th></tr></thead>
+      <tbody>
+        {% for task in project.tasks %}
+          {{ task_row(task, url_for('projects.detail', project_id=project.id)) }}
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="empty">No tasks yet.</p>
+  {% endif %}
+
+  <p class="row-actions">
+    <a href="{{ url_for('projects.index') }}">← All projects</a>
+    <form method="post" class="inline"
+          action="{{ url_for('projects.delete', project_id=project.id) }}"
+          onsubmit="return confirm('Delete this project and every task in it?');">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      <button type="submit" class="danger">Delete project</button>
+    </form>
+  </p>
+{% endblock %}

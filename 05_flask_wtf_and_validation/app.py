@@ -52,6 +52,7 @@ from typing import Any
 from flask import Flask, flash, redirect, render_template, request, url_for
 from flask_wtf import CSRFProtect
 from flask_wtf.csrf import CSRFError
+from flask.typing import ResponseReturnValue
 from werkzeug.wrappers import Response
 
 from forms import ROLES, ApplicationForm, SearchForm
@@ -129,7 +130,7 @@ APPLICATIONS: list[Application] = []
 
 
 @app.route("/", methods=["GET", "POST"])
-def apply() -> str | Response:
+def apply() -> ResponseReturnValue:
     """Render and process the application form.
 
     ``ApplicationForm()`` binds itself to ``request.form`` automatically when

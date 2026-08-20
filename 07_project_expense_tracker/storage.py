@@ -32,7 +32,7 @@ import uuid
 from collections import defaultdict
 from datetime import date, datetime
 from pathlib import Path
-from typing import Any, Final, TypedDict
+from typing import Any, Final, TypedDict, cast
 
 # The data file sits beside this module, so the app works no matter which
 # directory you launch it from. `Path(__file__).parent` is the reliable way to
@@ -316,7 +316,9 @@ def summarise(expenses: list[Expense]) -> dict[str, Any]:
             }
             for name, amount in per_category.items()
         ),
-        key=lambda row: row["total_paise"],
+        # cast() tells mypy the sort key is orderable. The values really are
+        # ints; the dict is only typed dict[str, object] because it mixes types.
+        key=lambda row: cast(int, row["total_paise"]),
         reverse=True,
     )
 

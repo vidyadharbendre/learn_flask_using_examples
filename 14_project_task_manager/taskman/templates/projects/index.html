@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import render_field %}
+{% block title %}Projects{% endblock %}
+
+{% block content %}
+  <h2>Your projects</h2>
+  <div class="two-col-wide">
+    <section>
+      {% if projects %}
+        <ul class="cards">
+          {% for project in projects %}
+            <li class="card">
+              <a href="{{ url_for('projects.detail', project_id=project.id) }}">
+                {{ project.name }}</a>
+              <span class="hint">{{ project.description|truncate(70) }}</span>
+              {# progress and open_count are Python properties over an
+                 eager-loaded relationship, so no query fires per card. #}
+              <div class="progress"><span style="width: {{ project.progress }}%"></span></div>
+              <span class="hint">{{ project.progress }}% done ·
+                {{ project.open_count }} open of {{ project.tasks|length }}</span>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="empty">No projects yet — create one on the right.</p>
+      {% endif %}
+    </section>
+
+    <section>
+      <h3>New project</h3>
+      <form method="post" action="{{ url_for('projects.index') }}" novalidate>
+        {{ form.hidden_tag() }}
+        {{ render_field(form.name) }}
+        {{ render_field(form.description) }}
+        <p>{{ form.submit() }}</p>
+      </form>
+    </section>
+  </div>
+{% endblock %}

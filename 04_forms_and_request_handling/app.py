@@ -56,6 +56,7 @@ from flask import (
     session,
     url_for,
 )
+from flask.typing import ResponseReturnValue
 from werkzeug.wrappers import Response
 
 app = Flask(__name__)
@@ -212,7 +213,7 @@ def validate_lead(form: dict[str, str]) -> dict[str, str]:
 # Views
 # -----------------------------------------------------------------------------
 @app.route("/", methods=["GET", "POST"])
-def request_demo() -> str | Response:
+def request_demo() -> ResponseReturnValue:
     """Show the demo-request form and handle its submission.
 
     One endpoint handles both verbs, which keeps the URL stable and the logic
@@ -277,7 +278,9 @@ def request_demo() -> str | Response:
         ), 422
 
     # 4. Accept.
-    LEADS.append({**data, "submitted_at": datetime.now(timezone.utc)})  # type: ignore[arg-type]
+    # mypy cannot verify a TypedDict built by ** expansion from a plain dict.
+    # The keys are correct by construction above; the ignore is narrow and named.
+    LEADS.append({**data, "submitted_at": datetime.now(timezone.utc)})  # type: ignore[typeddict-item]
     flash(f"Thanks {data['name']} — we'll be in touch at {data['email']}.", "success")
 
     # 303 See Other is the precise status for "your POST worked, now GET this".
@@ -299,7 +302,7 @@ def thank_you() -> str:
 
 
 @app.route("/leads")
-def list_leads() -> str | Response:
+def list_leads() -> ResponseReturnValue:
     """List captured leads as HTML **or** JSON, chosen by content negotiation.
 
     The same URL serves both representations. Which one you get depends on the
