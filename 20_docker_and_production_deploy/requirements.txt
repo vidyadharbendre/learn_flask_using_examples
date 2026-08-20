@@ -1,0 +1,8 @@
+# Day 20 — runtime dependencies ONLY.
+#
+# A production image must not carry pytest, mypy, ipython or a debugger: they
+# enlarge the image and widen the attack surface for no benefit. Keep dev tools
+# in requirements-dev.txt and install them only where they are used.
+Flask==3.0.3
+gunicorn==23.0.0
+Werkzeug==3.0.4
