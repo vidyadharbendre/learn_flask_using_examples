@@ -46,6 +46,7 @@ import click
 from flask import Flask, jsonify, request
 from flask.cli import with_appcontext
 from flask.typing import ResponseReturnValue
+from sqlalchemy.exc import OperationalError
 from sqlalchemy import select
 
 from .extensions import db
@@ -189,6 +190,38 @@ def create_app(config_name: str = "development") -> Flask:
         click.echo("Seeded 3 rooms.")
 
     app.cli.add_command(seed)
+
+    # -----------------------------------------------------------------------------
+    # A friendly error for the most common beginner mistake
+    # -----------------------------------------------------------------------------
+    # Skip the setup step and SQLAlchemy raises `OperationalError: no such table`,
+    # which tells a beginner nothing about what to do next. Catching it and naming
+    # the exact command turns a dead end into a one-line fix.
+    #
+    # This is a small thing that matters: the quality of your error messages IS the
+    # quality of your onboarding.
+    @app.errorhandler(OperationalError)
+    def database_not_initialised(error: OperationalError) -> ResponseReturnValue:
+        """Explain a missing table instead of showing a raw SQLAlchemy traceback.
+
+        Args:
+            error: The raised ``OperationalError``.
+
+        Returns:
+            ResponseReturnValue: A 503 naming the command that fixes it, or a generic
+            500 for any other database failure.
+        """
+        if "no such table" not in str(getattr(error, "orig", error)).lower():
+            # Some other database problem — do not pretend to diagnose it.
+            return jsonify(error={"code": "database_error", "message": "A database error occurred."}), 500
+
+        return jsonify(error={
+            "code": "database_not_initialised",
+            "message": "The database tables do not exist yet.",
+            "fix": "cd 17_testing_with_pytest && FLASK_APP=wsgi.py flask seed",
+            "see": "This day's README, section 3.",
+        }), 503
+
     return app
 
 

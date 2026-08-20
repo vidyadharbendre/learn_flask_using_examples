@@ -203,3 +203,8 @@ early at the first differing byte, and that timing difference is measurable.
 **[Day 05 — Flask-WTF and Validation →](../05_flask_wtf_and_validation/)**
 Everything you wrote by hand today, declared in ~15 lines: form classes,
 built-in and custom validators, and automatic CSRF.
+
+---
+
+<!-- nav -->
+[← Day 03 — Jinja Templates and Static Files](../03_jinja_templates_and_static/) · **[All 21 days](../README.md)** · [Day 05 — Flask-WTF and Validation →](../05_flask_wtf_and_validation/)

@@ -296,3 +296,8 @@ rows with no file : 0
 **[Day 17 — Testing with pytest →](../17_testing_with_pytest/)**
 Day 14 shipped a test suite. Now learn the craft: fixtures, isolation, what to
 test and — just as important — what not to.
+
+---
+
+<!-- nav -->
+[← Day 15 — JWT Auth and Role-Based Access Control](../15_jwt_auth_and_rbac/) · **[All 21 days](../README.md)** · [Day 17 — Testing with pytest →](../17_testing_with_pytest/)

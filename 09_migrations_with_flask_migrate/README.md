@@ -274,3 +274,8 @@ first, drop one release later.
 **[Day 10 — Blueprints and the Application Factory →](../10_blueprints_and_app_factory/)**
 `app.py` is getting long. Split it into blueprints, build the app with
 `create_app()`, and configure it per environment.
+
+---
+
+<!-- nav -->
+[← Day 08 — Database with SQLAlchemy](../08_database_with_sqlalchemy/) · **[All 21 days](../README.md)** · [Day 10 — Blueprints and the Application Factory →](../10_blueprints_and_app_factory/)

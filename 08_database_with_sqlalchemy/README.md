@@ -314,3 +314,8 @@ example.
 
 **[Day 09 — Migrations with Flask-Migrate →](../09_migrations_with_flask_migrate/)**
 `create_all()` cannot evolve a schema that already holds data. Alembic can.
+
+---
+
+<!-- nav -->
+[← Day 07 — Week 1 Project: Expense Tracker](../07_project_expense_tracker/) · **[All 21 days](../README.md)** · [Day 09 — Migrations with Flask-Migrate →](../09_migrations_with_flask_migrate/)

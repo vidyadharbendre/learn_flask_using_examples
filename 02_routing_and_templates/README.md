@@ -185,3 +185,8 @@ Rules worth memorising:
 
 **[Day 03 — Jinja Templates and Static Files →](../03_jinja_templates_and_static/)**
 Macros, filters, `include`, context processors, and organising CSS/JS properly.
+
+---
+
+<!-- nav -->
+[← Day 01 — Hello, Flask](../01_hello_world/) · **[All 21 days](../README.md)** · [Day 03 — Jinja Templates and Static Files →](../03_jinja_templates_and_static/)

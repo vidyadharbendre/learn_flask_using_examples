@@ -52,6 +52,7 @@ from typing import Any
 
 import click
 from flask import (
+    render_template_string,
     Flask,
     Response,
     abort,
@@ -63,6 +64,7 @@ from flask import (
     url_for,
 )
 from flask.typing import ResponseReturnValue
+from sqlalchemy.exc import OperationalError
 from werkzeug.wrappers import Response as WerkzeugResponse
 
 import repository as repo
@@ -428,6 +430,43 @@ def demo_n_plus_one_command() -> None:
 
     click.echo(f"    touched {len(products)} products -> 2 queries\n")
 
+
+
+# -----------------------------------------------------------------------------
+# A friendly error for the most common beginner mistake
+# -----------------------------------------------------------------------------
+# Skip the setup step and SQLAlchemy raises `OperationalError: no such table`,
+# which tells a beginner nothing about what to do next. Catching it and naming
+# the exact command turns a dead end into a one-line fix.
+#
+# This is a small thing that matters: the quality of your error messages IS the
+# quality of your onboarding.
+@app.errorhandler(OperationalError)
+def database_not_initialised(error: OperationalError) -> ResponseReturnValue:
+    """Explain a missing table instead of showing a raw SQLAlchemy traceback.
+
+    Args:
+        error: The raised ``OperationalError``.
+
+    Returns:
+        ResponseReturnValue: A 503 naming the command that fixes it, or a generic
+        500 for any other database failure.
+    """
+    if "no such table" not in str(getattr(error, "orig", error)).lower():
+        # Some other database problem — do not pretend to diagnose it.
+        return render_template_string("<h1>Database error</h1><p>See the server log.</p>"), 500
+
+    return render_template_string(
+        """<!doctype html><title>Database not ready</title>
+        <style>body{font-family:system-ui,sans-serif;background:#0f172a;color:#e2e8f0;
+        display:grid;place-items:center;min-height:100vh;margin:0}
+        div{max-width:40rem;padding:2rem}pre{background:#1e293b;padding:1rem;
+        border-radius:.5rem;overflow-x:auto}code{color:#38bdf8}</style>
+        <div><h1>The database has not been set up yet</h1>
+        <p>The tables do not exist. Run this first, then reload:</p>
+        <pre>flask --app 08_database_with_sqlalchemy/app.py init-db\nflask --app 08_database_with_sqlalchemy/app.py seed</pre>
+        <p style="color:#94a3b8">See this day's README, section 3.</p></div>"""
+    ), 503
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5008, debug=True)

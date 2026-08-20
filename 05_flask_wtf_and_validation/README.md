@@ -253,3 +253,8 @@ support ticket. Catch `CSRFError` and render a human explanation.
 **[Day 06 — Sessions, Cookies and Flash →](../06_sessions_cookies_and_flash/)**
 How the signed session cookie you have been relying on since Day 04 actually
 works — and a shopping cart built on it.
+
+---
+
+<!-- nav -->
+[← Day 04 — Forms and Request Handling](../04_forms_and_request_handling/) · **[All 21 days](../README.md)** · [Day 06 — Sessions, Cookies and Flash →](../06_sessions_cookies_and_flash/)

@@ -309,3 +309,8 @@ body.
 **[Day 13 — Authentication with Flask-Login →](../13_authentication_with_flask_login/)**
 Every endpoint so far has been wide open. Time for password hashing, sessions,
 and `@login_required`.
+
+---
+
+<!-- nav -->
+[← Day 11 — REST API Fundamentals](../11_rest_api_fundamentals/) · **[All 21 days](../README.md)** · [Day 13 — Authentication with Flask-Login →](../13_authentication_with_flask_login/)

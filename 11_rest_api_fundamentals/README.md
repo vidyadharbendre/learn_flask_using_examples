@@ -343,3 +343,8 @@ handles preflight `OPTIONS` and credential rules properly.
 **[Day 12 — Pydantic Validation and Schemas →](../12_pydantic_validation_and_schemas/)**
 `_validate_book()` is 90 lines of hand-written type checks. Pydantic replaces it
 with a declarative model — and gives you an OpenAPI schema for free.
+
+---
+
+<!-- nav -->
+[← Day 10 — Blueprints and the Application Factory](../10_blueprints_and_app_factory/) · **[All 21 days](../README.md)** · [Day 12 — Pydantic Validation and Schemas →](../12_pydantic_validation_and_schemas/)

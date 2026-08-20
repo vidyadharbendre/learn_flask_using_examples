@@ -252,3 +252,8 @@ the backend changes.
 **[Day 07 — Week 1 Project: Expense Tracker →](../07_project_expense_tracker/)**
 Everything from Days 01–06 in one application, with no database yet — the last
 day before SQLAlchemy makes persistence real.
+
+---
+
+<!-- nav -->
+[← Day 05 — Flask-WTF and Validation](../05_flask_wtf_and_validation/) · **[All 21 days](../README.md)** · [Day 07 — Week 1 Project: Expense Tracker →](../07_project_expense_tracker/)

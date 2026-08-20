@@ -192,3 +192,8 @@ once — which is the real lesson: **run the page.**
 
 **[Day 02 — Routing and Templates →](../02_routing_and_templates/)**
 Dynamic URLs, typed converters, `url_for`, and template inheritance.
+
+---
+
+<!-- nav -->
+*(start of the course)* · **[All 21 days](../README.md)** · [Day 02 — Routing and Templates →](../02_routing_and_templates/)

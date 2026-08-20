@@ -296,3 +296,8 @@ on launch day.
 **[Day 18 — Config, Logging and Errors →](../18_config_logging_and_errors/)**
 Twelve-factor configuration with `pydantic-settings`, structured logging,
 request ids, and error handling that tells you what actually happened.
+
+---
+
+<!-- nav -->
+[← Day 16 — File Uploads and Media](../16_file_uploads_and_media/) · **[All 21 days](../README.md)** · [Day 18 — Config, Logging and Error Handling →](../18_config_logging_and_errors/)

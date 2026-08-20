@@ -326,3 +326,8 @@ factory there is no single global answer.
 **[Day 11 — REST API Fundamentals →](../11_rest_api_fundamentals/)**
 The `api` blueprint was a sketch. Now design a real API: resources, status
 codes, pagination, consistent errors, and content negotiation.
+
+---
+
+<!-- nav -->
+[← Day 09 — Migrations with Flask-Migrate](../09_migrations_with_flask_migrate/) · **[All 21 days](../README.md)** · [Day 11 — REST API Fundamentals →](../11_rest_api_fundamentals/)

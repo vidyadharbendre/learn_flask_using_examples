@@ -310,3 +310,8 @@ What the 30 tests cover:
 **[Day 15 — JWT Auth and RBAC →](../15_jwt_auth_and_rbac/)**
 Session cookies work for browsers. Mobile apps and service-to-service calls need
 tokens: access/refresh pairs, claims, roles, and revocation.
+
+---
+
+<!-- nav -->
+[← Day 13 — Authentication with Flask-Login](../13_authentication_with_flask_login/) · **[All 21 days](../README.md)** · [Day 15 — JWT Auth and Role-Based Access Control →](../15_jwt_auth_and_rbac/)

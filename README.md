@@ -32,6 +32,14 @@ flask --app 01_hello_world/app.py run --port 5001 --debug
 Open <http://127.0.0.1:5001/>. That's it — no database server, no Docker, no
 build step needed until the days that teach them.
 
+**Check everything works before you start:**
+
+```bash
+./verify.sh                # runs all 21 days and reports pass/fail
+./verify.sh --tests        # …and the three pytest suites
+./verify.sh 08             # just one day
+```
+
 **Requirements:** Python 3.10+ (3.11 recommended). Verified on Python 3.11.7
 with Flask 3.0.3.
 
@@ -81,6 +89,24 @@ with Flask 3.0.3.
 
 ---
 
+## Which days need a setup step?
+
+Days 01–07 run with **no setup at all** — just `flask run`. From Day 08 there is
+a database, so each day's README section 3 gives you the exact commands. For
+reference:
+
+| Days | Before `flask run` | Why |
+|---|---|---|
+| 01–07 | *nothing* | no database yet |
+| **08** | `flask --app 08_.../app.py init-db` then `seed` | `create_all()` builds the tables |
+| **09** | `flask db upgrade -d 09_.../migrations` then `seed` | migrations, not `create_all()` |
+| **10–15, 17, 21** | `cd <day> && FLASK_APP=wsgi.py flask seed` | `seed` creates tables *and* demo data |
+| 16, 18, 19, 20 | *nothing* | no database, or created on first use |
+
+> **If you forget**, the app tells you. Skipping the step no longer produces a
+> raw `OperationalError: no such table` — you get a page (or JSON) naming the
+> exact command to run. Try it: delete a day's `instance/*.db` and reload.
+
 ## How to use this repository
 
 **Do the days in order.** Each one assumes the last. Day 05 only makes sense
@@ -116,10 +142,8 @@ For each day:
 ### Verify your setup
 
 ```bash
-./typecheck.sh                                   # type-check every day
-cd 14_project_task_manager && pytest             # 30 tests
-cd 17_testing_with_pytest && pytest              # 45 tests
-cd 21_capstone_analytics_dashboard && pytest     # 43 tests
+./verify.sh --tests     # every day runs + all three test suites (118 tests)
+./typecheck.sh          # type-check every day
 ```
 
 > Each day ships its own `app.py`, so a single `mypy .` fails with

@@ -250,3 +250,8 @@ all of it.
 **[Day 08 — Database with SQLAlchemy →](../08_database_with_sqlalchemy/)**
 Replace `storage.py` with a real database: models, sessions, queries,
 relationships, and the transactions that make concurrent writes safe.
+
+---
+
+<!-- nav -->
+[← Day 06 — Sessions, Cookies and Flash](../06_sessions_cookies_and_flash/) · **[All 21 days](../README.md)** · [Day 08 — Database with SQLAlchemy →](../08_database_with_sqlalchemy/)

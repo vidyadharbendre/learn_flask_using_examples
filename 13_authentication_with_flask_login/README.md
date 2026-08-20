@@ -331,3 +331,8 @@ Two traps:
 **[Day 14 — Week 2 Project: Task Manager →](../14_project_task_manager/)**
 Blueprints, database, migrations, auth, an API and tests — assembled into one
 application.
+
+---
+
+<!-- nav -->
+[← Day 12 — Pydantic Validation and Schemas](../12_pydantic_validation_and_schemas/) · **[All 21 days](../README.md)** · [Day 14 — Week 2 Project: Task Manager →](../14_project_task_manager/)

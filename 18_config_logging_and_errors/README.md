@@ -368,3 +368,8 @@ Confusing these two is among the most common Kubernetes misconfigurations.
 **[Day 19 — Caching, Rate Limiting and Background Jobs →](../19_caching_rate_limiting_and_jobs/)**
 Making it fast and keeping it up: caching, limits, timeouts, and work that
 should not happen inside a request.
+
+---
+
+<!-- nav -->
+[← Day 17 — Testing with pytest](../17_testing_with_pytest/) · **[All 21 days](../README.md)** · [Day 19 — Caching, Rate Limiting and Background Jobs →](../19_caching_rate_limiting_and_jobs/)

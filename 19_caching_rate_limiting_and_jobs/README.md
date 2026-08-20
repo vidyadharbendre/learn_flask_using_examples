@@ -338,3 +338,8 @@ Two details that make the thread pool usable at all:
 **[Day 20 — Docker and Production Deployment →](../20_docker_and_production_deploy/)**
 `app.run()` is not a production server. Gunicorn, a Dockerfile, a reverse proxy,
 and the security headers that belong in front of everything.
+
+---
+
+<!-- nav -->
+[← Day 18 — Config, Logging and Error Handling](../18_config_logging_and_errors/) · **[All 21 days](../README.md)** · [Day 20 — Docker and Production Deployment →](../20_docker_and_production_deploy/)

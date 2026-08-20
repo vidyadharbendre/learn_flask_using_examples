@@ -303,3 +303,8 @@ The vulnerability follows the *transport*, not the token format.
 **[Day 16 — File Uploads and Media →](../16_file_uploads_and_media/)**
 Accepting files from strangers: `secure_filename`, content sniffing, size
 limits, thumbnails, and serving uploads without handing out your filesystem.
+
+---
+
+<!-- nav -->
+[← Day 14 — Week 2 Project: Task Manager](../14_project_task_manager/) · **[All 21 days](../README.md)** · [Day 16 — File Uploads and Media →](../16_file_uploads_and_media/)

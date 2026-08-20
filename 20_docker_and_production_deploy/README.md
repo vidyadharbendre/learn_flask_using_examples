@@ -353,3 +353,8 @@ docker compose exec -T web nginx -s reload
 
 **[Day 21 — Capstone →](../21_capstone_analytics_dashboard/)**
 Everything from all twenty days, assembled into one deployable application.
+
+---
+
+<!-- nav -->
+[← Day 19 — Caching, Rate Limiting and Background Jobs](../19_caching_rate_limiting_and_jobs/) · **[All 21 days](../README.md)** · [Day 21 — Capstone: Pulse, a Feedback Analytics App →](../21_capstone_analytics_dashboard/)

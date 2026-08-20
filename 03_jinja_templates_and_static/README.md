@@ -216,3 +216,8 @@ And filters can replace loops entirely:
 **[Day 04 — Forms and Request Handling →](../04_forms_and_request_handling/)**
 `request.form`, the POST/Redirect/GET pattern, server-side validation, and
 manual CSRF — the groundwork before Flask-WTF does it for you on Day 05.
+
+---
+
+<!-- nav -->
+[← Day 02 — Routing and Templates](../02_routing_and_templates/) · **[All 21 days](../README.md)** · [Day 04 — Forms and Request Handling →](../04_forms_and_request_handling/)
