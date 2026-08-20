@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{# `extends` MUST be the first tag in the file. Everything outside a block in a
+   child template is discarded, so put all your markup inside blocks. #}
+
+{% block title %}All Staff{% endblock %}
+
+{% block content %}
+  <h2>Everyone ({{ employees|length }})</h2>
+
+  {# `{% for %}` iterates; `{% else %}` runs when the sequence is EMPTY — a
+     Jinja feature Python's for-loop does not have in this form. #}
+  <ul class="cards">
+    {% for employee in employees %}
+      <li class="card">
+        <a href="{{ url_for('employee_detail', employee_id=employee.id) }}">
+          {{ employee.name }}
+        </a>
+        <span class="role">{{ employee.role }}</span>
+        {# `|title` is a Jinja FILTER: it transforms the value before printing.
+           Filters chain left-to-right: {{ value|trim|title }} #}
+        <span class="badge">{{ employee.department|title }}</span>
+      </li>
+    {% else %}
+      <li class="empty">No employees yet.</li>
+    {% endfor %}
+  </ul>
+{% endblock %}

@@ -1,0 +1,36 @@
+<!doctype html>
+<!--
+  Day 01 — templates/index.html
+
+  This file lives in `templates/` because that is where Flask looks by default.
+  The `{{ ... }}` syntax is Jinja2: it prints the value of a variable that the
+  view function passed into `render_template(...)`.
+
+  Everything printed with `{{ }}` is HTML-escaped automatically, so a variable
+  containing `<script>` renders as harmless text rather than executing.
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Day {{ day }} — Hello, {{ framework }}</title>
+    <!-- url_for('static', ...) builds the correct URL even if the app is
+         mounted under a sub-path later. Never hardcode "/static/style.css". -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  </head>
+  <body>
+    <main class="card">
+      <p class="eyebrow">Day {{ day }} of 21</p>
+      <h1>Hello, {{ framework }}! 👋</h1>
+      <p>
+        If you can read this, you have a working WSGI application: Flask matched
+        the URL <code>/</code>, called the <code>home()</code> view, rendered
+        this template, and returned it as a <code>200 OK</code> response.
+      </p>
+      <p>
+        Now check the machine-readable side of the same service:
+        <a href="{{ url_for('health') }}"><code>/health</code></a>
+      </p>
+    </main>
+  </body>
+</html>

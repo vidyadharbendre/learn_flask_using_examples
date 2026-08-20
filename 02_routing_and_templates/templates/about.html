@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}About{% endblock %}
+
+{% block content %}
+  <h2>About this directory</h2>
+  <p>
+    A worked example of Flask routing: static routes, typed URL converters,
+    query-string filtering, redirects for retired URLs, and a custom 404 page.
+  </p>
+  <h3>The URL map</h3>
+  <table>
+    <thead><tr><th>Rule</th><th>Endpoint</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><code>/</code></td><td><code>home</code></td><td>static route</td></tr>
+      <tr><td><code>/about</code></td><td><code>about</code></td><td>static route</td></tr>
+      <tr><td><code>/team/&lt;int:employee_id&gt;</code></td><td><code>employee_detail</code></td><td>typed converter</td></tr>
+      <tr><td><code>/departments/&lt;department&gt;</code></td><td><code>department_list</code></td><td>string converter</td></tr>
+      <tr><td><code>/search?q=…</code></td><td><code>search</code></td><td>query string</td></tr>
+      <tr><td><code>/staff/&lt;int:employee_id&gt;</code></td><td><code>legacy_staff_redirect</code></td><td>301 redirect</td></tr>
+    </tbody>
+  </table>
+{% endblock %}

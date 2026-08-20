@@ -1,10 +1,60 @@
-blinker @ file:///home/conda/feedstock_root/build_artifacts/blinker_1731096409132/work
-click @ file:///home/conda/feedstock_root/build_artifacts/click_1734858813237/work
-Flask @ file:///home/conda/feedstock_root/build_artifacts/flask_1747203985407/work
-importlib_metadata @ file:///home/conda/feedstock_root/build_artifacts/bld/rattler-build_importlib-metadata_1747934053/work
-imutils==0.5.4
-itsdangerous @ file:///home/conda/feedstock_root/build_artifacts/itsdangerous_1733308265247/work
-Jinja2 @ file:///home/conda/feedstock_root/build_artifacts/jinja2_1741263328855/work
-MarkupSafe @ file:///Users/runner/miniforge3/conda-bld/markupsafe_1733219663979/work
-Werkzeug @ file:///home/conda/feedstock_root/build_artifacts/werkzeug_1733160440960/work
-zipp @ file:///home/conda/feedstock_root/build_artifacts/zipp_1749421620841/work
+# =============================================================================
+# learn_flask_using_examples — master requirement set (all 21 days)
+# =============================================================================
+# Install everything once and every day's example will run:
+#
+#     python3 -m venv .venv
+#     source .venv/bin/activate          # Windows: .venv\Scripts\activate
+#     pip install -r requirements.txt
+#
+# Each day also ships its own requirements.txt listing ONLY what that day
+# introduces, so you can install day-by-day if you prefer a leaner env.
+#
+# Versions are pinned so the examples behave identically on every machine.
+# Pinning is a production best practice: an unpinned dependency is a silent
+# time bomb that breaks your build on some random Tuesday.
+# =============================================================================
+
+# ---- Core framework (Day 01-07) --------------------------------------------
+Flask==3.0.3                 # the micro-framework itself
+Jinja2==3.1.4                # template engine used by render_template()
+Werkzeug==3.0.4              # WSGI toolkit: request/response, routing, dev server
+itsdangerous==2.2.0          # signs session cookies so they cannot be forged
+click==8.1.7                 # powers the `flask` CLI and custom commands
+MarkupSafe==2.1.5            # auto-escaping that stops XSS in templates
+
+# ---- Forms & validation (Day 05, 07) ---------------------------------------
+Flask-WTF==1.2.1             # Flask glue for WTForms + automatic CSRF protection
+WTForms==3.1.2               # declarative form definitions and validators
+email-validator==2.2.0       # required by WTForms' Email() validator
+
+# ---- Database & migrations (Day 08-10, 14) ---------------------------------
+Flask-SQLAlchemy==3.1.1      # Flask integration for SQLAlchemy sessions
+SQLAlchemy==2.0.36           # the ORM / query builder
+Flask-Migrate==4.0.7         # Alembic migrations wired into the flask CLI
+alembic==1.13.3              # schema migration engine
+
+# ---- Authentication (Day 13, 15) -------------------------------------------
+Flask-Login==0.6.3           # session-based login for server-rendered apps
+flask-jwt-extended==4.6.0    # JWT access/refresh tokens for APIs
+PyJWT==2.9.0                 # the underlying JWT encode/decode library
+
+# ---- Typed settings & API schemas (Day 12, 18) -----------------------------
+pydantic==2.9.2              # runtime validation + typed models at the edges
+pydantic-settings==2.6.0     # 12-factor config loaded from env vars
+python-dotenv==1.0.1         # reads .env files in development
+
+# ---- Performance & resilience (Day 19) -------------------------------------
+Flask-Caching==2.3.0         # response/function caching
+Flask-Limiter==3.8.0         # rate limiting to protect endpoints
+requests==2.32.3             # calling third-party HTTP APIs
+
+# ---- File handling (Day 16) ------------------------------------------------
+Pillow==10.4.0               # image validation and thumbnail generation
+
+# ---- Testing (Day 17) ------------------------------------------------------
+pytest==8.3.3                # test runner
+pytest-cov==5.0.0            # coverage reporting
+
+# ---- Production serving (Day 20-21) ----------------------------------------
+gunicorn==23.0.0             # production WSGI server (never use app.run in prod)

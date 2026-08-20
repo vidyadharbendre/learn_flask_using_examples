@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ department|title }}{% endblock %}
+
+{% block content %}
+  <h2>{{ department|title }} team</h2>
+
+  {# An `{% if %}` guard renders a helpful empty state. Blank pages make users
+     think the app is broken; an explicit message tells them it is not. #}
+  {% if employees %}
+    <ul class="cards">
+      {% for employee in employees %}
+        <li class="card">
+          <a href="{{ url_for('employee_detail', employee_id=employee.id) }}">
+            {{ employee.name }}
+          </a>
+          <span class="role">{{ employee.role }}</span>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="empty">
+      Nobody is listed under “{{ department }}”. Try
+      <a href="{{ url_for('department_list', department='engineering') }}">engineering</a>.
+    </p>
+  {% endif %}
+{% endblock %}

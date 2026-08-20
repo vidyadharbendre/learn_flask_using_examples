@@ -1,0 +1,20 @@
+/* Day 01 — static/style.css
+   Files in static/ are served by Flask's dev server at /static/<filename>.
+   In production a reverse proxy (nginx) or CDN serves these instead, because
+   Python should never be in the business of shipping bytes off disk. */
+:root { color-scheme: light dark; }
+body {
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  display: grid; place-items: center; min-height: 100vh; margin: 0;
+  background: #0f172a; color: #e2e8f0;
+}
+.card {
+  max-width: 34rem; padding: 2.5rem; border-radius: 1rem;
+  background: #1e293b; box-shadow: 0 20px 50px rgb(0 0 0 / 0.4);
+  line-height: 1.65;
+}
+.eyebrow { text-transform: uppercase; letter-spacing: .1em; font-size: .75rem;
+           color: #38bdf8; margin: 0 0 .5rem; }
+h1 { margin: 0 0 1rem; font-size: 2rem; }
+code { background: #334155; padding: .15em .4em; border-radius: .3em; font-size: .9em; }
+a { color: #38bdf8; }

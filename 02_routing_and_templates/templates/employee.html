@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ employee.name }}{% endblock %}
+
+{% block content %}
+  <article class="profile">
+    <h2>{{ employee.name }}</h2>
+    <p class="role">{{ employee.role }}</p>
+    <dl>
+      <dt>Department</dt>
+      <dd>
+        <a href="{{ url_for('department_list', department=employee.department) }}">
+          {{ employee.department|title }}
+        </a>
+      </dd>
+      <dt>Email</dt>
+      {# mailto: links are a rare, legitimate case for a literal href. #}
+      <dd><a href="mailto:{{ employee.email }}">{{ employee.email }}</a></dd>
+      <dt>Profile URL</dt>
+      <dd><code>{{ url_for('employee_detail', employee_id=employee.id) }}</code></dd>
+    </dl>
+    <p><a href="{{ url_for('home') }}">← Back to everyone</a></p>
+  </article>
+{% endblock %}

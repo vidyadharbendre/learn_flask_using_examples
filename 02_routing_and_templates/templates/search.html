@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Search{% endblock %}
+
+{% block content %}
+  <h2>Search results</h2>
+
+  {% if not query %}
+    <p class="empty">Type a name in the box above to search the directory.</p>
+  {% elif results %}
+    <p>{{ results|length }} match(es) for “{{ query }}”.</p>
+    <ul class="cards">
+      {% for employee in results %}
+        <li class="card">
+          <a href="{{ url_for('employee_detail', employee_id=employee.id) }}">
+            {{ employee.name }}
+          </a>
+          <span class="role">{{ employee.role }}</span>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="empty">No one matches “{{ query }}”.</p>
+  {% endif %}
+{% endblock %}

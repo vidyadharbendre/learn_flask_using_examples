@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block title %}Not Found{% endblock %}
+
+{% block content %}
+  <h2>404 — nothing here</h2>
+  {# `error.description` is the message passed to abort(404, description=...).
+     Show the friendly description, never a raw traceback. #}
+  <p class="empty">{{ error.description or "That page does not exist." }}</p>
+  <p><a href="{{ url_for('home') }}">← Back to the directory</a></p>
+{% endblock %}

@@ -1,0 +1,57 @@
+<!doctype html>
+{#
+  Day 02 — templates/base.html
+
+  This is the *skeleton* every other page inherits. Jinja2 template inheritance
+  works like class inheritance:
+
+    base.html   defines named holes:      {% block content %}{% endblock %}
+    child.html  fills them in:            {% extends 'base.html' %}
+                                          {% block content %}...{% endblock %}
+
+  Write the chrome (nav, footer, <head>) exactly once here. A change to the nav
+  is then one edit, not twenty.
+
+  {# ... #} is a Jinja comment: it never reaches the browser, unlike <!-- -->.
+#}
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {# `{% block title %}` has DEFAULT content. A child that omits the block
+       still gets a sensible title. Always give blocks useful defaults. #}
+    <title>{% block title %}Team Directory{% endblock %} · Day 02</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  </head>
+  <body>
+    <header>
+      <h1><a href="{{ url_for('home') }}">Team Directory</a></h1>
+      <nav>
+        {# url_for() takes the ENDPOINT NAME (the view function's name), never
+           a URL. Change the @app.route path and these links follow along. #}
+        <a href="{{ url_for('home') }}">Home</a>
+        <a href="{{ url_for('about') }}">About</a>
+        <a href="{{ url_for('department_list', department='engineering') }}">Engineering</a>
+        <a href="{{ url_for('search', q='a') }}">Search</a>
+      </nav>
+      <form action="{{ url_for('search') }}" method="get" class="searchbar">
+        {# A GET form serialises its fields into the query string, which is why
+           submitting this produces /search?q=whatever . #}
+        <input type="search" name="q" placeholder="Search by name…"
+               value="{{ query|default('', true) }}" aria-label="Search staff" />
+        <button type="submit">Search</button>
+      </form>
+    </header>
+
+    <main>{% block content %}{% endblock %}</main>
+
+    <footer>
+      <p>
+        &copy; 2025 Reinforcement Analytics ·
+        <a href="https://reinforcementanalytics.in/" target="_blank" rel="noopener">
+          reinforcementanalytics.in
+        </a>
+      </p>
+    </footer>
+  </body>
+</html>
