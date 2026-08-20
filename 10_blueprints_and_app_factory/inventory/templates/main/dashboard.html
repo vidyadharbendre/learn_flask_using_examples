@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import stat_tile %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+  <h2>Dashboard</h2>
+
+  <div class="tiles">
+    {{ stat_tile('Products', product_count) }}
+    {{ stat_tile('Units on hand', total_units) }}
+    {{ stat_tile('Stock value', total_value|inr) }}
+    {{ stat_tile('Categories', categories|length) }}
+  </div>
+
+  <h3>Needs restocking</h3>
+  {% if low_stock %}
+    <table>
+      <thead><tr><th>SKU</th><th>Name</th><th class="num">Qty</th><th class="num">Reorder at</th></tr></thead>
+      <tbody>
+        {% for product in low_stock %}
+          {# `qty_class` was registered by the products blueprint with
+             app_template_filter, which makes it available HERE, in the main
+             blueprint's template. Filters are application-wide. #}
+          <tr class="{{ product|qty_class }}">
+            <td><code>{{ product.sku }}</code></td>
+            <td><a href="{{ url_for('products.detail', product_id=product.id) }}">
+              {{ product.name }}</a></td>
+            <td class="num">{{ product.quantity }}</td>
+            <td class="num">{{ product.reorder_level }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="empty">Everything is above its reorder level.</p>
+  {% endif %}
+
+  <h3>Categories</h3>
+  <ul class="cards">
+    {% for category in categories %}
+      <li class="card">
+        <a href="{{ url_for('products.index', category=category.slug) }}">{{ category.name }}</a>
+        <span class="hint">{{ category.products|length }} product(s)</span>
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock %}

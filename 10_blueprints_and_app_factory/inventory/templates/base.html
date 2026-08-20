@@ -1,0 +1,46 @@
+<!doctype html>
+{#
+  Day 10 — templates/base.html (APP-level, shared by every blueprint)
+
+  Template lookup order:
+    1. the app's templates/ folder   <- this file
+    2. each blueprint's template_folder, in registration order
+
+  So an app-level file WINS over a blueprint file of the same name. That is how
+  you override a third-party blueprint's template without forking it.
+#}
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}Inventory{% endblock %} · {{ app_name }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  </head>
+  <body>
+    <header>
+      {# Endpoints are ALWAYS blueprint-qualified: "<blueprint>.<view>".
+         url_for('dashboard') raises BuildError — it must be 'main.dashboard'. #}
+      <h1><a href="{{ url_for('main.dashboard') }}">{{ app_name }}</a></h1>
+      <nav>
+        <a href="{{ url_for('main.dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('products.index') }}">Products</a>
+        <a href="{{ url_for('products.create') }}">Add product</a>
+        <a href="{{ url_for('api.list_products') }}">API</a>
+        <a href="{{ url_for('main.health') }}">Health</a>
+      </nav>
+    </header>
+    <main>
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <ul class="flashes">
+            {% for category, message in messages %}
+              <li class="flash flash-{{ category }}">{{ message }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      {% endwith %}
+      {% block content %}{% endblock %}
+    </main>
+    <footer><p>Day 10 — blueprints and the application factory</p></footer>
+  </body>
+</html>

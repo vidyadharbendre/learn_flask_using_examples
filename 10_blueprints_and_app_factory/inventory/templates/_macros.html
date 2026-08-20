@@ -1,0 +1,45 @@
+{# Day 10 — shared macros (app-level, usable from any blueprint's templates). #}
+
+{% macro render_field(field) %}
+  <div class="form-row">
+    {{ field.label }}
+    {{ field(**{'aria-invalid': 'true' if field.errors else 'false'}) }}
+    {% if field.errors %}
+      <ul class="field-error">
+        {% for error in field.errors %}<li>{{ error }}</li>{% endfor %}
+      </ul>
+    {% endif %}
+  </div>
+{% endmacro %}
+
+{% macro stat_tile(label, value, sub='') %}
+  <div class="card tile">
+    <span class="hint">{{ label }}</span>
+    <span class="stat">{{ value }}</span>
+    {% if sub %}<span class="hint">{{ sub }}</span>{% endif %}
+  </div>
+{% endmacro %}
+
+{% macro pager(pagination, endpoint, filters) %}
+  {#
+    Pagination links that PRESERVE the current filters.
+
+    `**filters` unpacks the active query parameters into url_for, so paging
+    through a filtered search keeps the filter. Forgetting this is why "page 2
+    shows unfiltered results" is such a common bug.
+  #}
+  {% if pagination.pages > 1 %}
+    <nav class="pager">
+      {% if pagination.has_prev %}
+        <a href="{{ url_for(endpoint, page=pagination.prev_num, **filters) }}">← Previous</a>
+      {% else %}<span class="hint">← Previous</span>{% endif %}
+
+      <span class="hint">Page {{ pagination.page }} of {{ pagination.pages }}
+        ({{ pagination.total }} items)</span>
+
+      {% if pagination.has_next %}
+        <a href="{{ url_for(endpoint, page=pagination.next_num, **filters) }}">Next →</a>
+      {% else %}<span class="hint">Next →</span>{% endif %}
+    </nav>
+  {% endif %}
+{% endmacro %}

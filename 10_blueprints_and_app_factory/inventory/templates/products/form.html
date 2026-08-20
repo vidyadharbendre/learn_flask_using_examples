@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import render_field %}
+
+{% block title %}{{ 'Edit' if product else 'New' }} product{% endblock %}
+
+{% block content %}
+  <h2>{{ 'Edit ' ~ product.name if product else 'Add a product' }}</h2>
+
+  {# One template serves create AND edit. The action differs; everything else
+     is identical, because ProductForm(obj=product) filled the fields. #}
+  <form method="post" novalidate
+        action="{{ url_for('products.edit', product_id=product.id) if product
+                  else url_for('products.create') }}">
+    {{ form.hidden_tag() }}
+    {{ render_field(form.sku) }}
+    {{ render_field(form.name) }}
+    <div class="two-col">
+      {{ render_field(form.price) }}
+      {{ render_field(form.category_id) }}
+    </div>
+    <div class="two-col">
+      {{ render_field(form.quantity) }}
+      {{ render_field(form.reorder_level) }}
+    </div>
+    <p>{{ form.submit() }}
+       <a class="hint" href="{{ url_for('products.index') }}">Cancel</a></p>
+  </form>
+{% endblock %}

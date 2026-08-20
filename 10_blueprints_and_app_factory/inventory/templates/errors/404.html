@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}Not found{% endblock %}
+{% block content %}
+  <h2>404 — not found</h2>
+  <p class="empty">{{ error.description or "That page does not exist." }}</p>
+  <p class="hint">
+    Note that <code>/api/…</code> returns JSON for the same error — the API
+    blueprint registers its own handler.
+  </p>
+  <p><a href="{{ url_for('main.dashboard') }}">← Dashboard</a></p>
+{% endblock %}

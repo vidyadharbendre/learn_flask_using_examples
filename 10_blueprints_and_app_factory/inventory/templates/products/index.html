@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import pager %}
+
+{% block title %}Products{% endblock %}
+
+{% block content %}
+  <h2>Products</h2>
+
+  <form method="get" action="{{ url_for('products.index') }}" class="filters">
+    <div class="form-row">
+      <label for="q">Search</label>
+      <input type="search" id="q" name="q" value="{{ filters.q }}" placeholder="Name or SKU…" />
+    </div>
+    <div class="form-row">
+      <label for="category">Category</label>
+      <select id="category" name="category">
+        <option value="">All categories</option>
+        {% for category in categories %}
+          <option value="{{ category.slug }}"
+                  {% if filters.category == category.slug %}selected{% endif %}>
+            {{ category.name }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+    <p><button type="submit">Filter</button>
+       <a class="hint" href="{{ url_for('products.index') }}">Clear</a></p>
+  </form>
+
+  {% if products %}
+    <table>
+      <thead>
+        <tr><th>SKU</th><th>Name</th><th>Category</th>
+            <th class="num">Price</th><th class="num">Qty</th><th></th></tr>
+      </thead>
+      <tbody>
+        {% for product in products %}
+          <tr class="{{ product|qty_class }}">
+            <td><code>{{ product.sku }}</code></td>
+            <td><a href="{{ url_for('products.detail', product_id=product.id) }}">
+              {{ product.name }}</a></td>
+            <td><span class="badge">{{ product.category.name }}</span></td>
+            <td class="num">{{ product.price|inr }}</td>
+            <td class="num">{{ product.quantity }}</td>
+            <td><a href="{{ url_for('products.edit', product_id=product.id) }}">Edit</a></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    {# Filters are threaded through so page 2 keeps the same search. #}
+    {{ pager(pagination, 'products.index', filters) }}
+  {% else %}
+    <p class="empty">
+      No products match. <a href="{{ url_for('products.create') }}">Add one</a>.
+    </p>
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}{{ product.name }}{% endblock %}
+
+{% block content %}
+  <article class="profile">
+    <h2>{{ product.name }}</h2>
+    <p class="hint"><code>{{ product.sku }}</code> · {{ product.category.name }}</p>
+    <dl>
+      <dt>Price</dt><dd>{{ product.price|inr }}</dd>
+      <dt>Quantity</dt>
+      <dd>{{ product.quantity }}
+        {% if product.is_low_stock %}<span class="badge warn">Low stock</span>{% endif %}
+      </dd>
+      <dt>Reorder level</dt><dd>{{ product.reorder_level }}</dd>
+      <dt>Created</dt><dd class="hint">{{ product.created_at }}</dd>
+      <dt>JSON</dt>
+      <dd><a href="{{ url_for('api.get_product', product_id=product.id) }}">
+        <code>{{ url_for('api.get_product', product_id=product.id) }}</code></a></dd>
+    </dl>
+  </article>
+
+  <p class="row-actions">
+    <a href="{{ url_for('products.index') }}">← All products</a>
+    <a href="{{ url_for('products.edit', product_id=product.id) }}">Edit</a>
+    <form method="post" class="inline"
+          action="{{ url_for('products.delete', product_id=product.id) }}"
+          onsubmit="return confirm('Delete this product?');">
+      <button type="submit" class="danger">Delete</button>
+    </form>
+  </p>
+{% endblock %}
