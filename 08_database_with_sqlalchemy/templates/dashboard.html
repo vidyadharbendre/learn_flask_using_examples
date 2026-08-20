@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import render_field, stat_tile %}
+
+{% block title %}Inventory{% endblock %}
+
+{% block content %}
+  <h2>Inventory</h2>
+
+  <div class="tiles">
+    {{ stat_tile('Products', summary.product_count) }}
+    {{ stat_tile('Units on hand', summary.total_units) }}
+    {# summary.total_value was computed by SQL: SUM(price * quantity).
+       The template only formats it — no arithmetic in Jinja. #}
+    {{ stat_tile('Stock value', summary.total_value|inr) }}
+    {{ stat_tile('Low stock', summary.low_stock_count,
+                 'at or below reorder level') }}
+  </div>
+
+  <div class="two-col-wide">
+    <section>
+      <h3>Add a product</h3>
+      <form method="post" action="{{ url_for('dashboard') }}" novalidate>
+        {{ form.hidden_tag() }}
+        {{ render_field(form.sku) }}
+        {{ render_field(form.name) }}
+        <div class="two-col">
+          {{ render_field(form.price) }}
+          {{ render_field(form.category_id) }}
+        </div>
+        <div class="two-col">
+          {{ render_field(form.quantity) }}
+          {{ render_field(form.reorder_level) }}
+        </div>
+        <p>{{ form.submit() }}</p>
+      </form>
+      <p class="hint">
+        Try adding a SKU that already exists. The error comes from the database's
+        <code>UNIQUE</code> constraint, not from a Python check — and it is
+        displayed on the field like any other validation message.
+      </p>
+    </section>
+
+    <section>
+      <h3>By category</h3>
+      <table>
+        <thead><tr><th>Category</th><th class="num">Items</th><th class="num">Value</th></tr></thead>
+        <tbody>
+          {% for row in summary.by_category %}
+            <tr>
+              <td>{{ row.name }}</td>
+              <td class="num">{{ row.product_count }}</td>
+              <td class="num">{{ row.value|inr }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <p class="hint">
+        “Accessories” has no products and still appears — that is the
+        <code>OUTER JOIN</code> in <code>inventory_summary()</code>. An inner
+        join would silently drop it.
+      </p>
+    </section>
+  </div>
+
+  <h3>Products</h3>
+  <form method="get" action="{{ url_for('dashboard') }}" class="filters">
+    <div class="form-row">
+      <label for="q">Search</label>
+      <input type="search" id="q" name="q" value="{{ filters.q }}"
+             placeholder="Name or SKU…" />
+    </div>
+    <div class="form-row">
+      <label for="category">Category</label>
+      <select id="category" name="category">
+        <option value="">All categories</option>
+        {% for category in categories %}
+          <option value="{{ category.slug }}"
+                  {% if filters.category == category.slug %}selected{% endif %}>
+            {{ category.name }} ({{ category.products|length }})
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-row">
+      <label class="check">
+        <input type="checkbox" name="low" value="1"
+               {% if filters.low == '1' %}checked{% endif %} />
+        <span>Low stock only</span>
+      </label>
+    </div>
+    <p><button type="submit">Filter</button>
+       <a class="hint" href="{{ url_for('dashboard') }}">Clear</a></p>
+  </form>
+
+  {% if products %}
+    <table>
+      <thead>
+        <tr><th>SKU</th><th>Name</th><th>Category</th>
+            <th class="num">Price</th><th class="num">Qty</th>
+            <th class="num">Value</th></tr>
+      </thead>
+      <tbody>
+        {% for product in products %}
+          <tr class="{{ 'is-low' if product.is_low_stock }}">
+            <td><code>{{ product.sku }}</code></td>
+            <td><a href="{{ url_for('product_detail', product_id=product.id) }}">
+              {{ product.name }}</a></td>
+            {# product.category.name would fire one query PER ROW if the
+               repository had not used selectinload(). Run with SQL_ECHO=1 to
+               watch the difference. #}
+            <td><a href="{{ url_for('dashboard', category=product.category.slug) }}"
+                   class="badge">{{ product.category.name }}</a></td>
+            <td class="num">{{ product.price|inr }}</td>
+            <td class="num">
+              {{ product.quantity }}
+              {% if product.is_low_stock %}<span class="warn-dot" title="Low stock">●</span>{% endif %}
+            </td>
+            {# stock_value is a Python @property: exact, because price is a
+               Decimal rather than a float. #}
+            <td class="num">{{ product.stock_value|inr }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="empty">
+      No products match. Seed some with
+      <code>flask --app 08_database_with_sqlalchemy/app.py seed</code>.
+    </p>
+  {% endif %}
+{% endblock %}

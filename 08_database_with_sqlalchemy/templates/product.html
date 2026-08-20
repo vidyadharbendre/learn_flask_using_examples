@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import render_field %}
+
+{% block title %}{{ product.name }}{% endblock %}
+
+{% block content %}
+  <article class="profile">
+    <h2>{{ product.name }}</h2>
+    <p class="hint"><code>{{ product.sku }}</code> · {{ product.category.name }}</p>
+
+    <dl>
+      <dt>Unit price</dt><dd>{{ product.price|inr }}</dd>
+      <dt>On hand</dt>
+      <dd>{{ product.quantity }}
+        {% if product.is_low_stock %}
+          <span class="badge warn">Low — reorder at {{ product.reorder_level }}</span>
+        {% endif %}
+      </dd>
+      <dt>Stock value</dt><dd>{{ product.stock_value|inr }}</dd>
+      <dt>Created</dt><dd class="hint">{{ product.created_at }}</dd>
+      <dt>Updated</dt><dd class="hint">{{ product.updated_at }}</dd>
+    </dl>
+  </article>
+
+  <div class="two-col-wide">
+    <section>
+      <h3>Record a movement</h3>
+      <form method="post" novalidate
+            action="{{ url_for('product_detail', product_id=product.id) }}">
+        {{ form.hidden_tag() }}
+        {{ render_field(form.delta) }}
+        {{ render_field(form.reason) }}
+        <p>{{ form.submit() }}</p>
+      </form>
+      <p class="hint">
+        Try removing more than you have. The friendly message comes from
+        <code>record_movement()</code>; the <code>CHECK (quantity &gt;= 0)</code>
+        constraint in <code>models.py</code> is the backstop that protects every
+        other code path.
+      </p>
+    </section>
+
+    <section>
+      <h3>Movement ledger</h3>
+      {# product.movements comes from the relationship, already ordered by
+         created_at DESC (declared with order_by= on the relationship). #}
+      {% if product.movements %}
+        <table>
+          <thead><tr><th>When</th><th class="num">Change</th><th>Reason</th></tr></thead>
+          <tbody>
+            {% for movement in product.movements %}
+              <tr>
+                <td class="hint">{{ movement.created_at.strftime('%d %b %Y %H:%M') }}</td>
+                <td class="num {{ 'pos' if movement.delta > 0 else 'neg' }}">
+                  {{ '+' if movement.delta > 0 }}{{ movement.delta }}
+                </td>
+                <td>{{ movement.reason }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        <p class="hint">
+          The quantity above is the running total of this ledger. Storing both
+          is deliberate: the ledger explains <em>how</em> the number got there.
+        </p>
+      {% else %}
+        <p class="empty">No movements recorded yet.</p>
+      {% endif %}
+    </section>
+  </div>
+
+  <p class="row-actions">
+    <a href="{{ url_for('dashboard') }}">← Back to inventory</a>
+    <form method="post" class="inline"
+          action="{{ url_for('delete_product', product_id=product.id) }}"
+          onsubmit="return confirm('Delete this product and its entire history?');">
+      <button type="submit" class="danger">Delete product</button>
+    </form>
+  </p>
+  <p class="hint">
+    Deleting cascades to the movement rows — see <code>cascade="all,
+    delete-orphan"</code> in <code>models.py</code>.
+  </p>
+{% endblock %}

@@ -1,0 +1,21 @@
+{# Day 08 — templates/_macros.html #}
+
+{% macro render_field(field) %}
+  <div class="form-row">
+    {{ field.label }}
+    {{ field(**{'aria-invalid': 'true' if field.errors else 'false'}) }}
+    {% if field.errors %}
+      <ul class="field-error">
+        {% for error in field.errors %}<li>{{ error }}</li>{% endfor %}
+      </ul>
+    {% endif %}
+  </div>
+{% endmacro %}
+
+{% macro stat_tile(label, value, sub='') %}
+  <div class="card tile">
+    <span class="hint">{{ label }}</span>
+    <span class="stat">{{ value }}</span>
+    {% if sub %}<span class="hint">{{ sub }}</span>{% endif %}
+  </div>
+{% endmacro %}
