@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{#
+  IMPORT the macro, then call it once per plan. Three cards, one definition:
+  fix a bug in plan_card and all three are fixed.
+#}
+{% from '_macros.html' import plan_card %}
+
+{% block title %}Pricing{% endblock %}
+
+{% block content %}
+  <h2>Simple, transparent pricing</h2>
+  <p class="hint">All prices in INR, billed monthly. Cancel any time.</p>
+
+  {# INCLUDE a fixed partial — no arguments needed. #}
+  {% include '_flash_banner.html' %}
+
+  <ul class="cards">
+    {% for plan in plans %}
+      {{ plan_card(plan, url_for('plan_detail', slug=plan.slug)) }}
+    {% endfor %}
+  </ul>
+
+  <h3>Compare at a glance</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Plan</th><th class="num">Price</th>
+        <th class="num">Seats</th><th class="num">Features</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for plan in plans %}
+        {# `loop.cycle` alternates values across iterations — handy for zebra
+           striping without any JavaScript. #}
+        <tr class="{{ loop.cycle('row-odd', 'row-even') }}">
+          <td><a href="{{ url_for('plan_detail', slug=plan.slug) }}">{{ plan.name }}</a></td>
+          <td class="num">{{ plan.price_inr|inr }}</td>
+          <td class="num">{{ plan.seats }}</td>
+          <td class="num">{{ plan.features|length }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      {# Filters chain and can take arguments. `map('attribute', 'x')` pulls one
+         key out of every dict; `sum` adds them up. This is real logic done
+         declaratively — no loop counter in sight. #}
+      <tr>
+        <td><strong>Total if you bought all three</strong></td>
+        <td class="num"><strong>{{ plans|map(attribute='price_inr')|sum|inr }}</strong></td>
+        <td class="num"><strong>{{ plans|map(attribute='seats')|sum }}</strong></td>
+        <td class="num">—</td>
+      </tr>
+    </tfoot>
+  </table>
+{% endblock %}

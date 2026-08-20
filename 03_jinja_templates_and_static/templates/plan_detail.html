@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import feature_row %}
+
+{% block title %}{{ plan.name }} plan{% endblock %}
+
+{% block content %}
+  <article class="profile">
+    <h2>{{ plan.name }}</h2>
+    <p class="price">{{ plan.price_inr|inr }}<span class="per">/month</span></p>
+    <p class="hint">{{ plan.blurb }}</p>
+
+    <dl>
+      {# Macros with defaults: the third call opts into the emphasis styling. #}
+      {{ feature_row('Monthly price', plan.price_inr|inr) }}
+      {{ feature_row('Annual price', (plan.price_inr * 12 * 0.85)|round|int|inr) }}
+      {{ feature_row('Seats', plan.seats|pluralize('seat')) }}
+      {{ feature_row('Most popular', 'Yes' if plan.popular else 'No', emphasis=plan.popular) }}
+    </dl>
+
+    <h3>What you get</h3>
+    <ul class="features">
+      {% for feature in plan.features %}
+        {# loop.first / loop.last let you style edges without extra variables. #}
+        <li{% if loop.first %} class="is-first"{% endif %}>
+          {{ loop.index }}. {{ feature }}
+        </li>
+      {% endfor %}
+    </ul>
+
+    <p><a href="{{ url_for('pricing') }}">← All plans</a></p>
+  </article>
+{% endblock %}
+
+{% block scripts %}
+  {# Page-specific JS goes in the block the base template left open. #}
+  <script>console.log("Viewing plan: {{ plan.slug }}");</script>
+{% endblock %}

@@ -1,0 +1,39 @@
+<!doctype html>
+{# Day 03 — templates/base.html : skeleton + macro-driven navigation. #}
+{% from '_macros.html' import nav_link %}
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}Pricing{% endblock %} · {{ company }}</title>
+
+    {# static/ is organised into css/ js/ img/. url_for handles the sub-path. #}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+
+    {# An EMPTY block lets a child page add page-specific <head> content
+       without you writing a separate base template for it. #}
+    {% block head_extra %}{% endblock %}
+  </head>
+  <body>
+    <header>
+      <h1><a href="{{ url_for('pricing') }}">{{ company }}</a></h1>
+      <nav>
+        {{ nav_link('pricing', 'Pricing') }}
+        {{ nav_link('escaping_demo', 'Escaping demo') }}
+      </nav>
+    </header>
+
+    <main>
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+      <p>&copy; {{ current_year }} {{ company }} · questions?
+         <a href="mailto:{{ support_email }}">{{ support_email }}</a></p>
+    </footer>
+
+    {# `defer` lets the HTML finish parsing before the script runs. #}
+    <script defer src="{{ url_for('static', filename='js/app.js') }}"></script>
+    {% block scripts %}{% endblock %}
+  </body>
+</html>

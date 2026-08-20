@@ -1,0 +1,20 @@
+{#
+  Day 03 — templates/_flash_banner.html
+
+  An INCLUDE is a copy-paste replacement: `{% include '_flash_banner.html' %}`
+  drops this file's rendered output in place, and it can see the including
+  template's variables.
+
+  include vs. import(macro):
+    include -> "paste this block here"; shares the caller's context.
+    macro   -> "call this function with arguments"; isolated and parameterised.
+
+  Rule of thumb: if it never varies, include it. If it takes arguments, macro.
+#}
+<aside class="flash flash-info">
+  <strong>Onboarding call:</strong> every paid plan includes a free 30-minute
+  setup session. Reply to
+  <a href="mailto:{{ support_email }}">{{ support_email }}</a> to book one.
+  {# `support_email` was never passed to render_template(). It comes from the
+     context processor in app.py, which injects it into EVERY template. #}
+</aside>

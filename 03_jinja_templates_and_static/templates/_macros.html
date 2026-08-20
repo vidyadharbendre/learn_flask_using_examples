@@ -1,0 +1,77 @@
+{#
+  Day 03 — templates/_macros.html
+
+  A MACRO is a reusable, parameterised chunk of template — a function that
+  returns HTML. This is the single most under-used Jinja feature.
+
+  Naming convention: files that are only ever imported/included are prefixed
+  with an underscore so they read as "partials, not pages".
+
+  Import it from another template with:
+      {% from '_macros.html' import plan_card %}
+#}
+
+{% macro plan_card(plan, detail_url) %}
+  {#
+    Render one pricing card.
+
+    Args (by convention — Jinja has no type system, so DOCUMENT them):
+      plan       : dict with slug, name, price_inr, seats, features, popular, blurb
+      detail_url : URL string the "View details" link points at
+  #}
+  <li class="card plan {% if plan.popular %}plan-popular{% endif %}">
+    {% if plan.popular %}<span class="badge">Most popular</span>{% endif %}
+
+    <h3>{{ plan.name }}</h3>
+
+    {# Our custom filters from app.py, used exactly like built-ins. #}
+    <p class="price">{{ plan.price_inr|inr }}<span class="per">/month</span></p>
+    <p class="role">{{ plan.seats|pluralize('seat') }} included</p>
+
+    {# plan.blurb contains "<no credit card needed>". Autoescaping renders that
+       as literal text instead of an unknown HTML tag. Nothing to do — this is
+       the default and it is protecting you right now. #}
+    <p class="hint">{{ plan.blurb }}</p>
+
+    <ul class="features">
+      {% for feature in plan.features %}
+        {# `loop` is Jinja's free loop-state object:
+             loop.index (1-based) loop.index0 (0-based)
+             loop.first  loop.last  loop.length  loop.revindex #}
+        <li>{{ feature }}</li>
+      {% endfor %}
+    </ul>
+
+    <a class="cta" href="{{ detail_url }}">View details →</a>
+  </li>
+{% endmacro %}
+
+
+{% macro feature_row(label, value, emphasis=false) %}
+  {#
+    A definition-list row with an optional highlight.
+
+    Macro arguments support DEFAULTS, just like Python. Callers may pass
+    positionally or by keyword: feature_row('Seats', 15, emphasis=true)
+  #}
+  <div class="feature-row {% if emphasis %}is-emphasis{% endif %}">
+    <dt>{{ label }}</dt>
+    <dd>{{ value }}</dd>
+  </div>
+{% endmacro %}
+
+
+{% macro nav_link(endpoint, label) %}
+  {#
+    A nav link that marks itself "current".
+
+    `request` is one of Jinja's standard globals inside a Flask request — you do
+    not need to pass it in. `request.endpoint` is the name of the view handling
+    the current request, which is exactly what url_for() takes.
+  #}
+  <a href="{{ url_for(endpoint) }}"
+     class="{% if request.endpoint == endpoint %}is-current{% endif %}"
+     {% if request.endpoint == endpoint %}aria-current="page"{% endif %}>
+    {{ label }}
+  </a>
+{% endmacro %}

@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}Autoescaping{% endblock %}
+
+{% block content %}
+  <h2>Autoescaping, <code>|safe</code>, and why order matters</h2>
+
+  <p class="hint">
+    The variable <code>hostile</code> is the string
+    <code>&lt;script&gt;alert('xss')&lt;/script&gt; Bobby &lt;b&gt;Tables&lt;/b&gt;</code>.
+    Below it is rendered four ways. <strong>View source</strong> to see the
+    difference in the bytes actually sent to your browser.
+  </p>
+
+  <h3>1. Default — autoescaped (safe ✅)</h3>
+  <pre>{{ '{{ hostile }}' }}</pre>
+  <div class="card">{{ hostile }}</div>
+  <p class="hint">
+    Jinja converted <code>&lt;</code> to <code>&amp;lt;</code>. The script tag is
+    displayed, never executed. This is the default for <code>.html</code>
+    templates and it is why Flask apps are XSS-resistant out of the box.
+  </p>
+
+  <h3>2. <code>|e</code> — explicit escape (safe ✅, redundant)</h3>
+  <div class="card">{{ hostile|e }}</div>
+  <p class="hint">Harmless but unnecessary; <code>|e</code> is already implied.</p>
+
+  <h3>3. <code>|safe</code> on untrusted input (DANGEROUS ❌)</h3>
+  <pre>{{ '{{ hostile|safe }}' }}</pre>
+  <div class="card">{{ hostile|safe }}</div>
+  <p class="hint">
+    That box just executed an alert-shaped payload — the <code>&lt;b&gt;</code>
+    renders bold and the script tag was injected into your DOM.
+    <strong>Never apply <code>|safe</code> to anything a user typed.</strong>
+  </p>
+
+  <h3>4. <code>Markup(...)</code> produced by our own code (safe ✅)</h3>
+  <div class="card">{{ trusted }}</div>
+  <p class="hint">
+    <code>trusted</code> was wrapped in <code>Markup()</code> inside
+    <code>app.py</code>. It is safe because <em>we</em> wrote it, not because we
+    called <code>|safe</code>.
+  </p>
+
+  <h3>5. The right way to emit HTML around user input</h3>
+  <p class="hint">
+    The <code>highlight</code> filter escapes first, then adds its own
+    <code>&lt;mark&gt;</code> tags, then returns <code>Markup</code>:
+  </p>
+  <div class="card">{{ hostile|highlight('bobby') }}</div>
+
+  <div class="flash flash-warning">
+    <strong>The rule:</strong> escape untrusted input <em>first</em>, add your
+    trusted markup <em>second</em>, and mark the result safe <em>last</em>.
+    Building a string and slapping <code>|safe</code> on the end is how XSS
+    vulnerabilities are written.
+  </div>
+{% endblock %}
