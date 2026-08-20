@@ -1,0 +1,85 @@
+{#
+  Day 05 — templates/_formhelpers.html
+
+  ONE macro renders every field type correctly. Without it you would write the
+  label / input / error triple thirteen times in apply.html, and the day you
+  add an `aria-describedby` you would edit it thirteen times.
+
+  This macro is the piece of Flask-WTF boilerplate worth memorising.
+#}
+
+{% macro render_field(field, extra_class='') %}
+  {#
+    Render one WTForms field: label, widget, errors, and description.
+
+    Args:
+      field       : a bound WTForms field (e.g. form.email)
+      extra_class : optional CSS class appended to the widget
+
+    Key objects on a bound field:
+      field.label()   -> <label for="..."> with the correct `for`
+      field()         -> the widget itself; kwargs become HTML attributes
+      field.errors    -> list of messages after validation (empty before)
+      field.id/.name  -> DOM id and form key
+      field.flags     -> introspected validator flags, e.g. .required
+  #}
+  <div class="form-row">
+    {{ field.label }}
+
+    {#
+      Calling field() renders the right widget for the field's type: <input>,
+      <textarea>, <select>, or a group of radios. Keyword arguments become
+      attributes, and class_ maps to class (class is a Python keyword).
+    #}
+    {{ field(class_=extra_class,
+             **{'aria-invalid': 'true' if field.errors else 'false',
+                'aria-describedby': field.id ~ '-error' if field.errors else ''}) }}
+
+    {#
+      field.errors is populated by validate_on_submit(). Each field can carry
+      several messages — a field failing both Length and Regexp reports both.
+    #}
+    {% if field.errors %}
+      <ul class="field-error" id="{{ field.id }}-error">
+        {% for error in field.errors %}<li>{{ error }}</li>{% endfor %}
+      </ul>
+    {% endif %}
+  </div>
+{% endmacro %}
+
+
+{% macro render_checkbox(field) %}
+  {# Checkboxes need the input BEFORE the label to read correctly. #}
+  <div class="form-row form-check">
+    <label class="check">
+      {{ field() }} <span>{{ field.label.text }}</span>
+    </label>
+    {% if field.errors %}
+      <ul class="field-error">
+        {% for error in field.errors %}<li>{{ error }}</li>{% endfor %}
+      </ul>
+    {% endif %}
+  </div>
+{% endmacro %}
+
+
+{% macro render_radios(field) %}
+  {#
+    A RadioField is ITERABLE: looping yields one bound sub-field per choice,
+    each with its own .label and its own render call. Calling field() directly
+    produces an unstyled <ul>, so loop when you care about the markup.
+  #}
+  <fieldset class="form-row">
+    <legend>{{ field.label.text }}</legend>
+    <div class="radio-group">
+      {% for choice in field %}
+        <label class="check">{{ choice() }} <span>{{ choice.label.text }}</span></label>
+      {% endfor %}
+    </div>
+    {% if field.errors %}
+      <ul class="field-error">
+        {% for error in field.errors %}<li>{{ error }}</li>{% endfor %}
+      </ul>
+    {% endif %}
+  </fieldset>
+{% endmacro %}

@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% from '_formhelpers.html' import render_field, render_checkbox, render_radios %}
+
+{% block title %}Apply{% endblock %}
+
+{% block content %}
+  <h2>Apply for a role</h2>
+  <p class="hint">
+    Thirteen fields, zero hand-written validation. Compare with
+    <code>04_forms_and_request_handling/app.py</code>.
+  </p>
+
+  {#
+    A form-level error summary. Screen-reader users and anyone on a long form
+    benefit from being told what went wrong before they start scrolling.
+    form.errors is {field_name: [messages]}.
+  #}
+  {% if form.errors %}
+    <div class="flash flash-error" role="alert">
+      <strong>{{ form.errors|length }} field(s) need attention.</strong>
+      <ul>
+        {% for field_name, messages in form.errors.items() %}
+          <li>
+            <a href="#{{ form[field_name].id }}">{{ form[field_name].label.text }}</a>:
+            {{ messages|join(' ') }}
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  <form method="post" action="{{ url_for('apply') }}" novalidate>
+    {#
+      form.hidden_tag() renders EVERY hidden field, including the CSRF token.
+      Forget this one line and every POST is rejected with a 400 — it is the
+      most common Flask-WTF mistake by a wide margin.
+    #}
+    {{ form.hidden_tag() }}
+
+    {{ render_field(form.full_name) }}
+    {{ render_field(form.email) }}
+    {{ render_field(form.phone) }}
+    {{ render_field(form.role) }}
+
+    <div class="two-col">
+      {{ render_field(form.years_experience) }}
+      {{ render_field(form.expected_salary) }}
+    </div>
+
+    {{ render_radios(form.work_mode) }}
+    {{ render_field(form.available_from) }}
+    {{ render_field(form.portfolio) }}
+    {{ render_field(form.cover_letter) }}
+    {{ render_checkbox(form.relocate) }}
+    {{ render_checkbox(form.consent) }}
+
+    <p>{{ form.submit(class_='btn') }}</p>
+  </form>
+{% endblock %}

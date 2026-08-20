@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}Session expired{% endblock %}
+{% block content %}
+  <h2>Your session expired</h2>
+  <p>
+    The security token attached to that form is no longer valid — usually
+    because the page sat open for too long.
+  </p>
+  <p class="hint">Technical reason: {{ reason }}</p>
+  <p><a href="{{ url_for('apply') }}">← Start the form again</a></p>
+{% endblock %}

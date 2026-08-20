@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% from '_formhelpers.html' import render_field %}
+
+{% block title %}Applications{% endblock %}
+
+{% block content %}
+  <h2>Applications ({{ applications|length }})</h2>
+
+  {#
+    A GET form. Note there is NO form.hidden_tag() here: SearchForm sets
+    Meta.csrf = False, because a filter changes no state and a token in the
+    query string would be cached and leaked in Referer headers.
+  #}
+  <form method="get" action="{{ url_for('applications') }}" class="filters">
+    {{ render_field(form.q) }}
+    {{ render_field(form.role) }}
+    <p>{{ form.submit(class_='btn') }}
+       <a class="hint" href="{{ url_for('applications') }}">Clear</a></p>
+  </form>
+
+  {% if applications %}
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th><th>Role</th><th class="num">Years</th>
+          <th class="num">Expected</th><th>Mode</th><th>Available</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for a in applications %}
+          <tr>
+            <td>{{ a.full_name }}<br /><span class="hint">{{ a.email }}</span></td>
+            <td>{{ a.role_label }}</td>
+            <td class="num">{{ a.years_experience }}</td>
+            <td class="num">₹{{ '{:,}'.format(a.expected_salary) }}</td>
+            <td>{{ a.work_mode|title }}{% if a.relocate %} · will relocate{% endif %}</td>
+            {# available_from is a real date object, so strftime just works. #}
+            <td>{{ a.available_from.strftime('%d %b %Y') }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="empty">
+      No applications match. <a href="{{ url_for('apply') }}">Submit one</a>.
+    </p>
+  {% endif %}
+{% endblock %}
