@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}Your cart{% endblock %}
+
+{% block content %}
+  <h2>Your cart</h2>
+
+  {% if lines %}
+    <table>
+      <thead>
+        <tr><th>Book</th><th class="num">Price</th><th>Qty</th><th class="num">Subtotal</th></tr>
+      </thead>
+      <tbody>
+        {% for line in lines %}
+          <tr>
+            <td>{{ line.book.title }}<br /><span class="hint">{{ line.book.author }}</span></td>
+            {# The price shown is looked up from the catalogue on THIS request,
+               never read from the cookie. See cart_lines() in app.py. #}
+            <td class="num">₹{{ '{:,}'.format(line.book.price_inr) }}</td>
+            <td>
+              <form method="post" class="inline"
+                    action="{{ url_for('update_cart', sku=line.book.sku) }}">
+                <input type="number" name="quantity" value="{{ line.quantity }}"
+                       min="0" max="{{ line.book.stock }}" style="width:4.5rem" />
+                <button type="submit">Update</button>
+              </form>
+              <span class="hint">0 removes it</span>
+            </td>
+            <td class="num">₹{{ '{:,}'.format(line.subtotal) }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr><td colspan="3"><strong>Total</strong></td>
+            <td class="num"><strong>₹{{ '{:,}'.format(total) }}</strong></td></tr>
+      </tfoot>
+    </table>
+
+    <p class="row-actions">
+      <form method="post" action="{{ url_for('clear_cart') }}" class="inline">
+        <button type="submit">Empty cart</button>
+      </form>
+      <form method="post" action="{{ url_for('toggle_remember') }}" class="inline">
+        <button type="submit">Toggle “remember for 7 days”</button>
+      </form>
+    </p>
+  {% else %}
+    <p class="empty">
+      Your cart is empty. <a href="{{ url_for('catalogue') }}">Browse the catalogue</a>.
+    </p>
+  {% endif %}
+{% endblock %}

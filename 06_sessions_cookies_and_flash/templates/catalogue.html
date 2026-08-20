@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Catalogue{% endblock %}
+
+{% block content %}
+  <h2>Catalogue</h2>
+  <p class="hint">
+    Add a few books, then visit <a href="{{ url_for('session_debug') }}">session
+    debug</a> to see exactly what your browser is storing.
+  </p>
+
+  <ul class="cards">
+    {% for book in books %}
+      <li class="card">
+        <strong>{{ book.title }}</strong>
+        <span class="role">{{ book.author }}</span>
+        <span class="price">₹{{ '{:,}'.format(book.price_inr) }}</span>
+        <span class="hint">
+          {{ book.stock }} in stock
+          {% if cart.get(book.sku) %}· {{ cart[book.sku] }} in your cart{% endif %}
+        </span>
+
+        {# A POST form, not a link. GET must never change state: browsers
+           prefetch links, crawlers follow them, and <img src> triggers them. #}
+        <form method="post" action="{{ url_for('add_to_cart', sku=book.sku) }}">
+          <button type="submit"
+                  {% if cart.get(book.sku, 0) >= book.stock %}disabled{% endif %}>
+            {% if cart.get(book.sku, 0) >= book.stock %}Max reached{% else %}Add to cart{% endif %}
+          </button>
+        </form>
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock %}

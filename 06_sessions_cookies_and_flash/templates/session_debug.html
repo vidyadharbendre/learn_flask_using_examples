@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block title %}Session debug{% endblock %}
+
+{% block content %}
+  <h2>What your browser is actually storing</h2>
+
+  <h3>1. <code>session</code> — signed, sent in the <code>session</code> cookie</h3>
+  {% if session_items %}
+    <table>
+      <thead><tr><th>Key</th><th>Value</th><th>Python type</th></tr></thead>
+      <tbody>
+        {% for key, value in session_items.items() %}
+          <tr><td><code>{{ key }}</code></td><td><code>{{ value }}</code></td>
+              <td class="hint">{{ value.__class__.__name__ }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="empty">Session is empty — add something to your cart first.</p>
+  {% endif %}
+
+  <p class="hint">
+    Permanent: <strong>{{ permanent }}</strong> ·
+    lifetime when permanent: <strong>{{ lifetime }}</strong>
+  </p>
+
+  <h3>2. Raw cookies your browser sent</h3>
+  <table>
+    <thead><tr><th>Cookie</th><th>Value (truncated)</th></tr></thead>
+    <tbody>
+      {% for name, value in cookies.items() %}
+        <tr><td><code>{{ name }}</code></td>
+            {# `|truncate` is a built-in Jinja filter: length, killwords, end #}
+            <td><code>{{ value|truncate(70, true, '…') }}</code></td></tr>
+      {% else %}
+        <tr><td colspan="2" class="empty">No cookies yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="flash flash-warning">
+    <h3 style="margin-top:0">3. Signed ≠ encrypted — prove it yourself</h3>
+    <p>
+      Copy the value of the <code>session</code> cookie above and run this in a
+      terminal. You will read your own cart back in plain text:
+    </p>
+<pre>python - &lt;&lt;'PY'
+import base64, zlib
+raw = "PASTE_THE_SESSION_COOKIE_HERE"
+# Format: &lt;payload&gt;.&lt;timestamp&gt;.&lt;signature&gt;
+# A LEADING dot means the payload is zlib-compressed, so check `raw` first.
+if raw.startswith("."):
+    payload, decode = raw[1:].split(".")[0], zlib.decompress
+else:
+    payload, decode = raw.split(".")[0], (lambda b: b)
+padded = payload + "=" * (-len(payload) % 4)
+print(decode(base64.urlsafe_b64decode(padded)))
+PY</pre>
+    <p>
+      The signature after the last <code>.</code> stops you <em>changing</em> the
+      value without the <code>SECRET_KEY</code> — it does not stop you
+      <em>reading</em> it. Never put a password, API key or card number in a
+      session.
+    </p>
+  </div>
+{% endblock %}

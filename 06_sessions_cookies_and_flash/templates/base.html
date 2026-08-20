@@ -1,0 +1,62 @@
+<!doctype html>
+{# Day 06 — templates/base.html : `theme` comes from a plain cookie via the
+   context processor, `cart_count` from the session. Two storage mechanisms,
+   both readable in every template. #}
+<html lang="en" data-theme="{{ theme }}">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}Shop{% endblock %} · {{ company }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  </head>
+  <body>
+    <header>
+      <h1><a href="{{ url_for('catalogue') }}">{{ company }}</a></h1>
+      <nav>
+        <a href="{{ url_for('catalogue') }}">Catalogue</a>
+        <a href="{{ url_for('view_cart') }}">
+          Cart{% if cart_count %} <span class="badge">{{ cart_count }}</span>{% endif %}
+        </a>
+        <a href="{{ url_for('session_debug') }}">Session debug</a>
+
+        {# Changing a preference is a state change, so it is a POST — even
+           though nothing is "saved" server-side. #}
+        <form method="post" class="inline"
+              action="{{ url_for('set_theme', theme='light' if theme == 'dark' else 'dark') }}">
+          <button type="submit" class="linkish">
+            {{ 'Light mode' if theme == 'dark' else 'Dark mode' }}
+          </button>
+        </form>
+      </nav>
+    </header>
+
+    <main>
+      {#
+        FLASH MESSAGES — the mechanism, now that you know what a session is.
+
+        flash("text", "category") appends to session["_flashes"].
+        get_flashed_messages() reads that list AND DELETES IT.
+
+        That read-and-delete is why a flash survives exactly one redirect: the
+        POST stores it, the redirected GET renders and clears it. Refresh the
+        page and it is gone. This is precisely what POST/Redirect/GET needs.
+
+        Call get_flashed_messages() twice on one page and the second call
+        returns nothing — a genuinely confusing bug the first time you hit it.
+      #}
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <ul class="flashes">
+            {% for category, message in messages %}
+              <li class="flash flash-{{ category }}">{{ message }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      {% endwith %}
+
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer><p>Day 06 — sessions, cookies and flash</p></footer>
+  </body>
+</html>
