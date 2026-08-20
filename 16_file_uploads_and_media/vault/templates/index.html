@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% block title %}Files{% endblock %}
+
+{% block content %}
+  <h2>Upload a file</h2>
+
+  {#
+    enctype="multipart/form-data" is MANDATORY for file uploads. Without it the
+    browser sends only the FILENAME as an ordinary text field: request.files is
+    empty and request.form contains the name. This is the single most common
+    upload bug, and it produces no error — just a mysteriously missing file.
+  #}
+  <form method="post" action="{{ url_for('index') }}" enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+    <div class="form-row">
+      <label for="file">Choose an image or PDF (max {{ max_mb }} MB)</label>
+      {#
+        `accept` is a CONVENIENCE: it filters the file picker's default view.
+        It is not a constraint — a user can pick "All files", and curl ignores
+        it entirely. The server sniffs the contents regardless.
+      #}
+      <input type="file" id="file" name="file"
+             accept="image/jpeg,image/png,image/gif,image/webp,application/pdf" />
+    </div>
+    <p><button type="submit">Upload</button></p>
+  </form>
+
+  <div class="flash flash-warning">
+    <strong>Try to break it.</strong> The server never trusts the filename, the
+    extension, or the declared content type:
+    <ul>
+      <li>Rename <code>photo.png</code> to <code>photo.pdf</code> — accepted,
+          and stored as <code>.png</code>, because the <em>bytes</em> decide.</li>
+      <li>Rename a text file to <code>.jpg</code> — rejected.</li>
+      <li>Upload a file called <code>../../etc/passwd</code> — stored under a
+          random name; the path is never built from your text.</li>
+      <li>Upload an SVG — rejected. An SVG is XML that can contain
+          <code>&lt;script&gt;</code>.</li>
+    </ul>
+  </div>
+
+  <h2>Stored files ({{ uploads|length }})</h2>
+  {% if uploads %}
+    <ul class="cards">
+      {% for upload in uploads %}
+        <li class="card">
+          {% if upload.thumb_name %}
+            {# The thumbnail is served INLINE — safe only because WE generated
+               it. It is a re-encoded JPEG from Pillow, not the user's bytes. #}
+            <a href="{{ url_for('download', upload_id=upload.id) }}">
+              <img class="thumb" src="{{ url_for('thumbnail', upload_id=upload.id) }}"
+                   alt="{{ upload.original_name }}" loading="lazy" />
+            </a>
+          {% else %}
+            <span class="thumb thumb-doc">PDF</span>
+          {% endif %}
+
+          <strong>{{ upload.original_name }}</strong>
+          <span class="hint">
+            {{ upload.content_type }} · {{ upload.human_size }}
+            {% if upload.width %}· {{ upload.width }}×{{ upload.height }}{% endif %}
+          </span>
+          {# The stored name is shown ONLY to make the lesson visible: note it
+             bears no relation to what the user called the file. #}
+          <span class="hint stored">on disk: <code>{{ upload.stored_name }}</code></span>
+
+          <span class="row-actions">
+            {# The download URL uses the database ID, never a filename — so
+               there is no path for a client to traverse. #}
+            <a href="{{ url_for('download', upload_id=upload.id) }}">Download</a>
+            <form method="post" class="inline"
+                  action="{{ url_for('delete', upload_id=upload.id) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+              <button type="submit" class="danger">Delete</button>
+            </form>
+          </span>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="empty">Nothing uploaded yet.</p>
+  {% endif %}
+{% endblock %}
