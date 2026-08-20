@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}{{ note.title }}{% endblock %}
+{% block content %}
+  <article class="profile">
+    <h2>{{ note.title }}</h2>
+    <p class="hint">{{ note.created_at.strftime('%d %b %Y %H:%M') }}</p>
+    <p>{{ note.body }}</p>
+  </article>
+  <p><a href="{{ url_for('main.dashboard') }}">← All notes</a></p>
+{% endblock %}

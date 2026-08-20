@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Admin{% endblock %}
+{% block content %}
+  <h2>All users</h2>
+  <p class="hint">
+    Reached through <code>@login_required</code> then <code>@admin_required</code>.
+    A signed-in non-admin gets <strong>403</strong> — they are authenticated,
+    they simply may not do this.
+  </p>
+  <table>
+    <thead>
+      <tr><th>Email</th><th>Name</th><th>Role</th><th>Active</th><th>Last login</th></tr>
+    </thead>
+    <tbody>
+      {% for user in users %}
+        <tr>
+          <td>{{ user.email }}</td>
+          <td>{{ user.display_name }}</td>
+          <td><span class="badge">{{ user.role }}</span></td>
+          <td>{{ 'yes' if user.active else 'no' }}</td>
+          <td class="hint">{{ user.last_login_at.strftime('%d %b %H:%M') if user.last_login_at else '—' }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {# Note there is no password_hash column here, and none in /api/me either.
+     Hashes are crackable offline; never put them in a response. #}
+{% endblock %}

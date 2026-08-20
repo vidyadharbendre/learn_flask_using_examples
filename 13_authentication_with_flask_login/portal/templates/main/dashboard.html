@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import render_field %}
+{% block title %}My notes{% endblock %}
+
+{% block content %}
+  <h2>{{ current_user.display_name }}’s notes</h2>
+  <p class="hint">
+    These are scoped by <code>WHERE user_id = current_user.id</code> in the
+    query — not filtered in the template. Scope the query, not the display.
+  </p>
+
+  <div class="two-col-wide">
+    <section>
+      <h3>New note</h3>
+      <form method="post" action="{{ url_for('main.dashboard') }}" novalidate>
+        {{ form.hidden_tag() }}
+        {{ render_field(form.title) }}
+        {{ render_field(form.body) }}
+        <p>{{ form.submit() }}</p>
+      </form>
+    </section>
+
+    <section>
+      <h3>Saved ({{ notes|length }})</h3>
+      {% if notes %}
+        <ul class="cards">
+          {% for note in notes %}
+            <li class="card">
+              <a href="{{ url_for('main.note_detail', note_id=note.id) }}">{{ note.title }}</a>
+              <span class="hint">{{ note.created_at.strftime('%d %b %Y %H:%M') }}</span>
+              <form method="post" class="inline"
+                    action="{{ url_for('main.delete_note', note_id=note.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                <button type="submit" class="danger">Delete</button>
+              </form>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="empty">No notes yet.</p>
+      {% endif %}
+    </section>
+  </div>
+
+  <div class="flash flash-warning">
+    <strong>Try the attack:</strong> note the id in a note’s URL, sign in as the
+    <em>other</em> demo user, and request the same
+    <code>/notes/&lt;id&gt;</code>. You get a <strong>404</strong>, because
+    <code>note_detail</code> checks ownership as well as authentication.
+    Without that check this would be an <strong>IDOR</strong> vulnerability.
+  </div>
+{% endblock %}

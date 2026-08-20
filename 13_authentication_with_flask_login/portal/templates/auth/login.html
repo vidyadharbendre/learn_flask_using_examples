@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import render_field %}
+{% block title %}Sign in{% endblock %}
+
+{% block content %}
+  <h2>Sign in</h2>
+  <form method="post" novalidate
+        action="{{ url_for('auth.login', next=request.args.get('next')) }}">
+    {# hidden_tag() renders the CSRF token — a login form needs it as much as
+       any other POST. #}
+    {{ form.hidden_tag() }}
+    {{ render_field(form.email) }}
+    {{ render_field(form.password) }}
+    <div class="form-row">
+      <label class="check">{{ form.remember() }} <span>{{ form.remember.label.text }}</span></label>
+    </div>
+    <p>{{ form.submit() }}</p>
+  </form>
+  <p class="hint">No account? <a href="{{ url_for('auth.register') }}">Register</a>.</p>
+{% endblock %}
