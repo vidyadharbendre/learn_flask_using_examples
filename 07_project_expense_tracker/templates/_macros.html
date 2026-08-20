@@ -1,0 +1,63 @@
+{# Day 07 — templates/_macros.html : reused across dashboard and detail. #}
+
+{% macro render_field(field, extra='') %}
+  {# Same helper as Day 05, carried forward. Reusing a known-good macro across
+     projects is exactly why you extract them. #}
+  <div class="form-row">
+    {{ field.label }}
+    {{ field(class_=extra,
+             **{'aria-invalid': 'true' if field.errors else 'false'}) }}
+    {% if field.errors %}
+      <ul class="field-error">
+        {% for error in field.errors %}<li>{{ error }}</li>{% endfor %}
+      </ul>
+    {% endif %}
+  </div>
+{% endmacro %}
+
+{% macro stat_tile(label, value, sub='') %}
+  {# A dashboard figure. Values arrive pre-computed from storage.summarise();
+     the template never does arithmetic. #}
+  <div class="card tile">
+    <span class="hint">{{ label }}</span>
+    <span class="stat">{{ value }}</span>
+    {% if sub %}<span class="hint">{{ sub }}</span>{% endif %}
+  </div>
+{% endmacro %}
+
+{% macro category_bar(row, label) %}
+  {#
+    A pure-CSS bar chart. `row.percent` was computed in Python — including the
+    zero-total guard — which is why this cannot divide by zero.
+
+    NOTE the `label` ARGUMENT. A macro is ISOLATED from the calling template's
+    context, so it cannot see `categories` from the context processor even
+    though every ordinary template can. Referencing it here raises
+    `UndefinedError: 'categories' is undefined`.
+
+    Two fixes exist:
+      1. pass what you need as an argument  <- this, and it is the better one
+      2. `{% from '_macros.html' import category_bar with context %}`
+    Option 2 works but makes the macro depend on invisible ambient state; the
+    signature no longer tells you what it needs. Prefer explicit arguments.
+  #}
+  <div class="bar-row">
+    <span class="bar-label">{{ label }}</span>
+    <span class="bar-track">
+      <span class="bar-fill" style="width: {{ row.percent }}%"></span>
+    </span>
+    <span class="bar-value">{{ row.total_paise|inr }}
+      <span class="hint">({{ row.percent }}%)</span>
+    </span>
+  </div>
+{% endmacro %}
+
+{% macro delete_button(expense_id, label='Delete') %}
+  {# Deleting is a POST inside its own form, never a link. `confirm` is a
+     courtesy for the user; the server does not rely on it. #}
+  <form method="post" class="inline"
+        action="{{ url_for('delete_expense', expense_id=expense_id) }}"
+        onsubmit="return confirm('Delete this expense?');">
+    <button type="submit" class="danger">{{ label }}</button>
+  </form>
+{% endmacro %}

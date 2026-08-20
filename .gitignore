@@ -41,3 +41,6 @@ coverage.xml
 .idea/
 .DS_Store
 Thumbs.db
+
+# ---- Day 07: runtime data written by the app (seeded, not source) ----
+07_project_expense_tracker/data/*.json

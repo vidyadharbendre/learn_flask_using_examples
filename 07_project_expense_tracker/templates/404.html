@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% block title %}Not found{% endblock %}
+{% block content %}
+  <h2>404 — not found</h2>
+  <p class="empty">{{ error.description or "That page does not exist." }}</p>
+  <p><a href="{{ url_for('dashboard') }}">← Back to dashboard</a></p>
+{% endblock %}

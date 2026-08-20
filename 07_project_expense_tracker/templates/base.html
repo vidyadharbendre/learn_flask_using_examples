@@ -1,0 +1,41 @@
+<!doctype html>
+{# Day 07 — templates/base.html #}
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}Dashboard{% endblock %} · {{ app_name }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  </head>
+  <body class="{{ 'compact' if compact else '' }}">
+    <header>
+      <h1><a href="{{ url_for('dashboard') }}">{{ app_name }}</a></h1>
+      <nav>
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('export_csv') }}">Export CSV</a>
+        <a href="{{ url_for('api_summary') }}">JSON summary</a>
+        <a href="{{ url_for('health') }}">Health</a>
+        <form method="post" action="{{ url_for('toggle_compact') }}" class="inline">
+          <button type="submit" class="linkish">
+            {{ 'Comfortable rows' if compact else 'Compact rows' }}
+          </button>
+        </form>
+      </nav>
+    </header>
+
+    <main>
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <ul class="flashes">
+            {% for category, message in messages %}
+              <li class="flash flash-{{ category }}">{{ message }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      {% endwith %}
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer><p>Day 07 — Week 1 project · data stored in <code>data/expenses.json</code></p></footer>
+  </body>
+</html>

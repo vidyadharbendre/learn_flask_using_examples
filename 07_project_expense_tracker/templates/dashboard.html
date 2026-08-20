@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import render_field, stat_tile, category_bar, delete_button %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+  <h2>Overview{% if filtered %} <span class="hint">(filtered)</span>{% endif %}</h2>
+
+  <div class="tiles">
+    {{ stat_tile('Total spent', summary.total_paise|inr,
+                 summary.count ~ ' expense(s)') }}
+    {{ stat_tile('Largest single',
+                 summary.largest.amount_paise|inr if summary.largest else '—',
+                 summary.largest.description if summary.largest else 'Nothing yet') }}
+    {{ stat_tile('Categories used', summary.by_category|length,
+                 'of ' ~ categories|length ~ ' available') }}
+    {{ stat_tile('Months covered', summary.by_month|length) }}
+  </div>
+
+  <div class="two-col-wide">
+    <section>
+      <h3>Add an expense</h3>
+      <form method="post" action="{{ url_for('dashboard', **filters) }}" novalidate>
+        {# hidden_tag() renders the CSRF token — omit it and every POST 400s. #}
+        {{ form.hidden_tag() }}
+        {{ render_field(form.spent_on) }}
+        {{ render_field(form.description) }}
+        <div class="two-col">
+          {{ render_field(form.amount) }}
+          {{ render_field(form.category) }}
+        </div>
+        {{ render_field(form.payment_method) }}
+        {{ render_field(form.note) }}
+        <p>{{ form.submit() }}</p>
+      </form>
+    </section>
+
+    <section>
+      <h3>Where the money goes</h3>
+      {% if summary.by_category %}
+        {% for row in summary.by_category %}
+          {# Pass the label in: the macro cannot see `categories` itself. #}
+          {{ category_bar(row, categories.get(row.category, row.category)) }}
+        {% endfor %}
+      {% else %}
+        <p class="empty">Add an expense to see the breakdown.</p>
+      {% endif %}
+
+      {% if summary.by_month %}
+        <h3>By month</h3>
+        <table>
+          <thead><tr><th>Month</th><th class="num">Total</th></tr></thead>
+          <tbody>
+            {% for row in summary.by_month %}
+              <tr>
+                {# A month cell links to its own filtered view — filters live in
+                   the URL, so this link is shareable and bookmarkable. #}
+                <td><a href="{{ url_for('dashboard', month=row.month) }}">
+                  {{ row.month|nice_month }}</a></td>
+                <td class="num">{{ row.total_paise|inr }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% endif %}
+    </section>
+  </div>
+
+  <h3>Expenses</h3>
+
+  {# GET filter form: no CSRF token (FilterForm sets Meta.csrf = False). #}
+  <form method="get" action="{{ url_for('dashboard') }}" class="filters">
+    {{ render_field(filter_form.q) }}
+    {{ render_field(filter_form.category) }}
+    {{ render_field(filter_form.month) }}
+    <p>
+      {{ filter_form.submit() }}
+      {% if filtered %}
+        <a class="hint" href="{{ url_for('dashboard') }}">Clear filters</a>
+      {% endif %}
+    </p>
+  </form>
+
+  {% if expenses %}
+    <p class="hint">
+      Showing {{ expenses|length }} expense(s) ·
+      {# Export respects the SAME filters — **filters unpacks the dict into
+         query-string arguments, so the CSV matches what you see. #}
+      <a href="{{ url_for('export_csv', **filters) }}">Export these as CSV</a>
+    </p>
+    <table>
+      <thead>
+        <tr><th>Date</th><th>Description</th><th>Category</th>
+            <th>Paid by</th><th class="num">Amount</th><th></th></tr>
+      </thead>
+      <tbody>
+        {% for expense in expenses %}
+          <tr>
+            <td>{{ expense.spent_on|nice_date }}</td>
+            <td>
+              <a href="{{ url_for('expense_detail', expense_id=expense.id) }}">
+                {{ expense.description }}</a>
+              {% if expense.note %}<br /><span class="hint">{{ expense.note }}</span>{% endif %}
+            </td>
+            <td><a href="{{ url_for('dashboard', category=expense.category) }}"
+                   class="badge">{{ categories.get(expense.category, expense.category) }}</a></td>
+            <td class="hint">{{ expense.payment_method|upper }}</td>
+            <td class="num">{{ expense.amount_paise|inr }}</td>
+            <td>{{ delete_button(expense.id, '×') }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="empty">
+      {% if filtered %}
+        Nothing matches those filters.
+        <a href="{{ url_for('dashboard') }}">Clear them</a>.
+      {% else %}
+        No expenses yet. Add one above, or seed demo data with
+        <code>flask --app 07_project_expense_tracker/app.py seed</code>.
+      {% endif %}
+    </p>
+  {% endif %}
+{% endblock %}

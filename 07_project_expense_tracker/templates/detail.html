@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import delete_button %}
+
+{% block title %}{{ expense.description }}{% endblock %}
+
+{% block content %}
+  <article class="profile">
+    <h2>{{ expense.description }}</h2>
+    <p class="stat">{{ expense.amount_paise|inr }}</p>
+    <dl>
+      <dt>Date</dt><dd>{{ expense.spent_on|nice_date }}</dd>
+      <dt>Category</dt>
+      <dd><a href="{{ url_for('dashboard', category=expense.category) }}">
+        {{ categories.get(expense.category, expense.category) }}</a></dd>
+      <dt>Paid by</dt><dd>{{ expense.payment_method|upper }}</dd>
+      <dt>Note</dt><dd>{{ expense.note or '—' }}</dd>
+      <dt>Recorded</dt><dd class="hint">{{ expense.created_at }}</dd>
+      <dt>Stored as</dt>
+      {# Showing the raw integer makes the "money as paise" lesson concrete. #}
+      <dd class="hint"><code>{{ expense.amount_paise }}</code> paise (integer)</dd>
+    </dl>
+    <p class="row-actions">
+      <a href="{{ url_for('dashboard') }}">← Back to dashboard</a>
+      {{ delete_button(expense.id) }}
+    </p>
+  </article>
+{% endblock %}
