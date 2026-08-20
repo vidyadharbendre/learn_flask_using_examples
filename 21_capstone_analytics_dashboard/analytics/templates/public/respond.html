@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import render_field %}
+{% block title %}{{ survey.title }}{% endblock %}
+
+{% block content %}
+  <article class="profile">
+    <h2>{{ survey.title }}</h2>
+    <p class="lead">{{ survey.question }}</p>
+
+    {# CSRF stays ON even though this is public and unauthenticated: it costs
+       nothing and stops a third-party page submitting on a visitor's behalf. #}
+    <form method="post" action="{{ url_for('public.respond', slug=survey.slug) }}" novalidate>
+      {{ form.hidden_tag() }}
+
+      <div class="form-row">
+        {{ form.score.label }}
+        <div class="score-row">
+          <span class="hint">0</span>
+          {{ form.score(oninput="document.getElementById('scoreval').textContent = this.value") }}
+          <span class="hint">10</span>
+          <output id="scoreval" class="stat">{{ form.score.data or 8 }}</output>
+        </div>
+        {% if form.score.errors %}
+          <ul class="field-error">{% for e in form.score.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+        {% endif %}
+      </div>
+
+      {{ render_field(form.comment) }}
+      <p>{{ form.submit() }}</p>
+    </form>
+    <p class="hint">
+      Your answer is anonymous. We store a one-way salted hash of your address
+      for duplicate detection — never the address itself.
+    </p>
+  </article>
+{% endblock %}

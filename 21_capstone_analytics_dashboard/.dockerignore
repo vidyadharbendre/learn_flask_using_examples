@@ -1,0 +1,54 @@
+# =============================================================================
+# Day 20 — .dockerignore
+# =============================================================================
+# Everything here is excluded from the BUILD CONTEXT — the archive Docker sends
+# to the daemon before the first instruction runs. This matters for three
+# reasons:
+#
+#   1. SPEED. Without it, `docker build` uploads your .venv, .git history and
+#      every database file. That is often hundreds of megabytes, on every build.
+#   2. CACHING. A change to any file in the context can invalidate cached
+#      layers, so an untracked log file causes a full rebuild.
+#   3. SECURITY. `COPY . .` copies .env and .git — and a .git directory in a
+#      shipped image contains every secret you ever committed and removed.
+#
+# Writing this file BEFORE the Dockerfile is the right order.
+# =============================================================================
+
+.git
+.gitignore
+.venv
+venv
+__pycache__
+*.py[cod]
+*.egg-info
+
+# Secrets — never in an image
+.env
+.env.*
+!.env.example
+
+# Local state
+instance/
+*.db
+*.sqlite3
+uploads/
+logs/
+
+# Dev tooling
+.pytest_cache
+.mypy_cache
+.ruff_cache
+.coverage
+htmlcov
+tests/
+requirements-dev.txt
+
+# Editors / OS
+.vscode
+.idea
+.DS_Store
+
+# Docs and compose files are not needed inside the image
+README.md
+docker-compose.yml

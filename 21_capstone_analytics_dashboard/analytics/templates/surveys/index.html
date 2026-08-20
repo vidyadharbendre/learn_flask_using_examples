@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import render_field, stat_tile, status_badge %}
+{% block title %}Surveys{% endblock %}
+
+{% block content %}
+  <h2>Your surveys</h2>
+
+  <div class="tiles">
+    {{ stat_tile('Surveys', surveys|length) }}
+    {{ stat_tile('Responses', total_responses) }}
+    {{ stat_tile('Average score', overall_average, 'across all surveys') }}
+  </div>
+
+  <div class="two-col-wide">
+    <section>
+      {% if surveys %}
+        <table>
+          <thead><tr><th>Survey</th><th>Status</th><th class="num">Responses</th></tr></thead>
+          <tbody>
+            {% for survey in surveys %}
+              <tr>
+                <td>
+                  <a href="{{ url_for('surveys.detail', survey_id=survey.id) }}">{{ survey.title }}</a>
+                  <br /><span class="hint">{{ survey.question|truncate(60) }}</span>
+                </td>
+                <td>{{ status_badge(survey.status) }}</td>
+                <td class="num">{{ survey.responses|length }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% if pagination.pages > 1 %}
+          <nav class="pager">
+            {% if pagination.has_prev %}
+              <a href="{{ url_for('surveys.index', page=pagination.prev_num) }}">← Previous</a>
+            {% endif %}
+            <span class="hint">Page {{ pagination.page }} of {{ pagination.pages }}</span>
+            {% if pagination.has_next %}
+              <a href="{{ url_for('surveys.index', page=pagination.next_num) }}">Next →</a>
+            {% endif %}
+          </nav>
+        {% endif %}
+      {% else %}
+        <p class="empty">No surveys yet — create one on the right.</p>
+      {% endif %}
+    </section>
+
+    <section>
+      <h3>New survey</h3>
+      <form method="post" action="{{ url_for('surveys.index') }}" novalidate>
+        {{ form.hidden_tag() }}
+        {{ render_field(form.title) }}
+        {{ render_field(form.question) }}
+        {{ render_field(form.status) }}
+        <p>{{ form.submit() }}</p>
+      </form>
+      <p class="hint">Only an <strong>open</strong> survey accepts responses.</p>
+    </section>
+  </div>
+{% endblock %}

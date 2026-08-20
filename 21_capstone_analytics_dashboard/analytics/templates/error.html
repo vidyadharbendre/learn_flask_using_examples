@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}{{ code }}{% endblock %}
+{% block content %}
+  <h2>{{ code }}</h2>
+  <p class="empty">{{ message }}</p>
+  {# The request id lets a user quote it in a support ticket, turning
+     "it broke yesterday" into one log query (Day 18 §10). #}
+  <p class="hint">Reference: <code>{{ request_id }}</code></p>
+  <p><a href="{{ url_for('home') }}">← Home</a></p>
+{% endblock %}

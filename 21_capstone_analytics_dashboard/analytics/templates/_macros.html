@@ -1,0 +1,42 @@
+{% macro render_field(field) %}
+  <div class="form-row">
+    {{ field.label }}
+    {{ field(**{'aria-invalid': 'true' if field.errors else 'false'}) }}
+    {% if field.errors %}
+      <ul class="field-error">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+    {% endif %}
+  </div>
+{% endmacro %}
+
+{% macro stat_tile(label, value, sub='') %}
+  <div class="card tile">
+    <span class="hint">{{ label }}</span>
+    <span class="stat">{{ value }}</span>
+    {% if sub %}<span class="hint">{{ sub }}</span>{% endif %}
+  </div>
+{% endmacro %}
+
+{% macro status_badge(status) %}
+  {# `status.value` is a plain string because the enum subclasses str, so it
+     doubles as a CSS class while Python keeps a real SurveyStatus member. #}
+  <span class="badge status-{{ status.value }}">{{ status.label }}</span>
+{% endmacro %}
+
+{% macro histogram(data, total) %}
+  {#
+    A pure-CSS bar chart. Every percentage is computed in Python
+    (models.summarise) — templates display numbers, they do not calculate them,
+    because logic in Jinja cannot be unit-tested.
+  #}
+  <div class="histogram">
+    {% for score in range(11) %}
+      {% set count = data[score|string] %}
+      {% set pct = (count / total * 100) if total else 0 %}
+      <div class="hbar" title="{{ count }} response(s) scored {{ score }}">
+        <span class="hbar-fill {{ 'promoter' if score >= 9 else 'passive' if score >= 7 else 'detractor' }}"
+              style="height: {{ [pct * 2, 4]|max }}%"></span>
+        <span class="hbar-label">{{ score }}</span>
+      </div>
+    {% endfor %}
+  </div>
+{% endmacro %}

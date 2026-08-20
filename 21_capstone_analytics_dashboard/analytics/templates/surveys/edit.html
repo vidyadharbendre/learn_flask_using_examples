@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import render_field %}
+{% block title %}Edit {{ survey.title }}{% endblock %}
+{% block content %}
+  <h2>Edit survey</h2>
+  <form method="post" action="{{ url_for('surveys.edit', survey_id=survey.id) }}" novalidate>
+    {{ form.hidden_tag() }}
+    {{ render_field(form.title) }}
+    {{ render_field(form.question) }}
+    {{ render_field(form.status) }}
+    <p>{{ form.submit() }}
+       <a class="hint" href="{{ url_for('surveys.detail', survey_id=survey.id) }}">Cancel</a></p>
+  </form>
+{% endblock %}

@@ -44,3 +44,6 @@ Thumbs.db
 
 # ---- Day 07: runtime data written by the app (seeded, not source) ----
 07_project_expense_tracker/data/*.json
+
+# ---- Day 21: runtime data ----
+21_capstone_analytics_dashboard/instance/

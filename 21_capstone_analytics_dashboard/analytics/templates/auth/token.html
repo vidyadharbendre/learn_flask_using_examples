@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}API token{% endblock %}
+{% block content %}
+  <h2>Your API token</h2>
+  <p class="hint">Send it as a bearer token — never in a query string, where it
+     would be recorded in logs, browser history and Referer headers.</p>
+  <pre>Authorization: Bearer {{ token }}</pre>
+
+  <h3>Try it</h3>
+  <pre>curl -s {{ url_for('api.list_surveys', _external=True) }} \
+  -H "Authorization: Bearer {{ token }}" | python -m json.tool</pre>
+
+  <form method="post" action="{{ url_for('auth.api_token') }}"
+        onsubmit="return confirm('Any integration using the current token will stop working.');">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    <p><button type="submit" class="danger">Rotate token</button></p>
+  </form>
+  <p class="hint">
+    Rotation <em>is</em> revocation for an opaque token: replace it and the old
+    one stops working immediately — no blocklist required (contrast Day 15).
+  </p>
+{% endblock %}
