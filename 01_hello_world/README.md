@@ -150,6 +150,35 @@ uses Flask's configured encoder, and handles unicode correctly.
 | Edits don't show up | reloader off | add `--debug` |
 | `debug=True` in production | Werkzeug debugger = remote code execution | drive it from an env var (Day 18) |
 | `jsonify` returns wrong content type | you used `json.dumps` instead | use `jsonify` |
+| `TemplateSyntaxError` from an HTML comment | `<!-- -->` is **not** a Jinja comment — Jinja still parses `{{ }}` inside it | use `{# … #}`, or `{% raw %}` to show syntax literally |
+| Comment text leaks into the page | **Jinja comments do not nest** — the first `#}` closes the whole block | never open a comment inside a comment |
+
+## 8b. Two comment traps (both hit while writing this file)
+
+```jinja
+<!-- The {{ variable }} syntax is Jinja -->     ❌ Jinja STILL parses this
+{# The {{ variable }} syntax is Jinja #}        ✅ stripped before rendering
+```
+
+An HTML comment reaches the browser **and** is parsed by Jinja on the way. A
+malformed example inside one raises `TemplateSyntaxError`; a valid one is
+silently evaluated.
+
+```jinja
+{# outer … {# inner #} … still outer #}         ❌ comments DO NOT NEST
+```
+
+The first `#}` closes the whole block, and everything after it leaks into the
+page as visible text.
+
+To display Jinja syntax to a reader, use a raw block:
+
+```jinja
+{% raw %}{{ framework }}{% endraw %}
+```
+
+Both mistakes were made in `templates/index.html` before it was rendered even
+once — which is the real lesson: **run the page.**
 
 ## 9. Exercises
 

@@ -1,32 +1,55 @@
 <!doctype html>
-<!--
-  Day 01 — templates/index.html
+{#
+  Day 01 - templates/index.html
 
   This file lives in `templates/` because that is where Flask looks by default.
-  The `{{ ... }}` syntax is Jinja2: it prints the value of a variable that the
-  view function passed into `render_template(...)`.
 
-  Everything printed with `{{ }}` is HTML-escaped automatically, so a variable
-  containing `<script>` renders as harmless text rather than executing.
--->
+  THIS IS A JINJA COMMENT, not an HTML one, and two things about it matter:
+
+  1. An HTML comment is NOT a Jinja comment. Jinja parses the whole file before
+     the browser sees it, so a double-brace example written inside an HTML
+     comment is still evaluated, and a malformed one raises TemplateSyntaxError.
+     That mistake broke this very file the first time it was written.
+
+  2. Jinja comments DO NOT NEST. Writing a comment-open marker inside this block
+     would make the first close marker end the whole thing early, and the rest
+     would leak into the page as visible text. That also happened here, on the
+     attempt to fix point 1.
+
+  To show Jinja syntax literally in the page, use a raw block - see the body
+  below, which prints a double-brace expression without evaluating it.
+#}
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Day {{ day }} — Hello, {{ framework }}</title>
-    <!-- url_for('static', ...) builds the correct URL even if the app is
-         mounted under a sub-path later. Never hardcode "/static/style.css". -->
+
+    {# url_for('static', ...) builds the correct URL even if the app is later
+       mounted under a sub-path. Never hardcode "/static/style.css". #}
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
   </head>
   <body>
     <main class="card">
       <p class="eyebrow">Day {{ day }} of 21</p>
       <h1>Hello, {{ framework }}! 👋</h1>
+
       <p>
         If you can read this, you have a working WSGI application: Flask matched
         the URL <code>/</code>, called the <code>home()</code> view, rendered
         this template, and returned it as a <code>200 OK</code> response.
       </p>
+
+      <p>
+        The double-brace syntax below is printed literally using
+        <code>{% raw %}{% raw %}{% endraw %}</code>, because otherwise Jinja
+        would try to evaluate it:
+      </p>
+      <p>
+        <code>{% raw %}{{ framework }}{% endraw %}</code> renders as
+        <strong>{{ framework }}</strong> — the value the view passed in.
+      </p>
+
       <p>
         Now check the machine-readable side of the same service:
         <a href="{{ url_for('health') }}"><code>/health</code></a>

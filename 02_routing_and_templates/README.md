@@ -130,7 +130,9 @@ Rules worth memorising:
 - `{% extends %}` must be the **first** tag in a child template.
 - Markup outside a `{% block %}` in a child is **discarded**.
 - Give blocks default content so a child can skip them.
-- `{# … #}` is a Jinja comment (stripped); `<!-- … -->` reaches the browser.
+- `{# … #}` is a Jinja comment (stripped); `<!-- … -->` reaches the browser —
+  **and is still parsed by Jinja**, so `{{ }}` inside one is evaluated.
+- Jinja comments **do not nest**: the first `#}` closes the whole block.
 
 ## 7. Jinja essentials used here
 
